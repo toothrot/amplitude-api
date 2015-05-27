@@ -1,10 +1,33 @@
 require 'spec_helper'
 
 describe AmplitudeAPI do
-  User = Struct.new(:id)
-
   before do
     @user = User.new(id: 123)
+  end
+
+  describe ".track" do
+    context "with a single event" do
+      it "sends the event to Amplitude" do
+        event = AmplitudeAPI::Event.new(user_id: 123, event_type: 'clicked on sign up')
+        body = {api_key: AmplitudeAPI.api_key, event: JSON.generate([event.to_hash])}
+
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::URI_STRING, body: body)
+
+        AmplitudeAPI.track(event)
+      end
+    end
+
+    context "with multiple events" do
+      it "sends all events in a single request" do
+        event = AmplitudeAPI::Event.new(user_id: 123, event_type: 'clicked on sign up')
+        event2 = AmplitudeAPI::Event.new(user_id: 456, event_type: 'liked a widget')
+        body = {api_key: AmplitudeAPI.api_key, event: JSON.generate([event.to_hash, event2.to_hash])}
+
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::URI_STRING, body: body)
+
+        AmplitudeAPI.track([event, event2])
+      end
+    end
   end
 
   describe ".send_event" do

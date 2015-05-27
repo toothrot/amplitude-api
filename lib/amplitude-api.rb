@@ -1,6 +1,7 @@
 require 'json'
 require 'bundler/setup'
 Bundler.require(:default)
+require 'amplitude-api/event'
 
 class AmplitudeAPI
   URI_STRING = "https://api.amplitude.com/httpapi"
@@ -31,6 +32,18 @@ class AmplitudeAPI
           event_properties: event_properties
         })
       }
+    end
+
+    def track(*events)
+      event_body = events.flatten.map do |event|
+        event.to_hash
+      end
+      post_body = {
+        api_key: self.api_key,
+        event: JSON.generate(event_body)
+      }
+
+      Typhoeus.post(URI_STRING, body: post_body)
     end
   end
 end
