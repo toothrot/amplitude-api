@@ -12,29 +12,11 @@ class AmplitudeAPI
     attr_accessor :api_key
 
     def send_event(event_name, user, properties = {})
-      user_id = 
-        if user.respond_to?(:id) 
-          user.id
-        else
-           user || USER_WITH_NO_ACCOUNT
-        end
-
-      body = body(event_name, user_id, properties)
-      Typhoeus.post(URI_STRING, body: body)
+      event = AmplitudeAPI::Event.new(user_id: user, event_type: event_name, event_properties: properties)
+      track(event)
     end
 
-    def body(event_type, user_id, event_properties)
-      {
-        api_key: self.api_key,
-        event: JSON.generate({
-          event_type: event_type,
-          user_id: user_id,
-          event_properties: event_properties
-        })
-      }
-    end
-
-    def track(*events)
+    def body(*events)
       event_body = events.flatten.map do |event|
         event.to_hash
       end
@@ -42,8 +24,10 @@ class AmplitudeAPI
         api_key: self.api_key,
         event: JSON.generate(event_body)
       }
+    end
 
-      Typhoeus.post(URI_STRING, body: post_body)
+    def track(*events)
+      Typhoeus.post(URI_STRING, body: body(events))
     end
   end
 end

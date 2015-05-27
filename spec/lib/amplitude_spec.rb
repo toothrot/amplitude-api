@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe AmplitudeAPI do
   before do
-    @user = User.new(id: 123)
+    @user = Struct.new(:id).new(123)
   end
 
   describe ".track" do
@@ -32,16 +32,16 @@ describe AmplitudeAPI do
 
   describe ".send_event" do
     it "sends an event to AmplitudeAPI" do
-      body = AmplitudeAPI.body("test_event", @user.id, test_property: 1)
-      expect(Typhoeus).to receive(:post).with(AmplitudeAPI::URI_STRING, body: body)
+      event = AmplitudeAPI::Event.new(user_id: @user, event_type: "test_event", event_properties: {test_property: 1})
+      expect(AmplitudeAPI).to receive(:track).with(event)
 
       AmplitudeAPI.send_event("test_event", @user, test_property: 1)
     end
 
     context "the user is nil" do
       it "sends an event with the no account user" do
-        body = AmplitudeAPI.body("test_event", AmplitudeAPI::USER_WITH_NO_ACCOUNT, test_property: 1)
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::URI_STRING, body: body)
+        event = AmplitudeAPI::Event.new(user_id: nil, event_type: "test_event", event_properties: {test_property: 1})
+        expect(AmplitudeAPI).to receive(:track).with(event)
 
         AmplitudeAPI.send_event("test_event", nil, test_property: 1)
       end
@@ -49,8 +49,8 @@ describe AmplitudeAPI do
 
     context "the user is a user_id" do
       it "sends an event to AmplitudeAPI" do
-        body = AmplitudeAPI.body("test_event", @user.id, test_property: 1)
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::URI_STRING, body: body)
+        event = AmplitudeAPI::Event.new(user_id: 123, event_type: "test_event", event_properties: {test_property: 1})
+        expect(AmplitudeAPI).to receive(:track).with(event)
 
         AmplitudeAPI.send_event("test_event", @user.id, test_property: 1)
       end
@@ -59,13 +59,16 @@ describe AmplitudeAPI do
 
   describe "#body" do
     it "should add an api key" do
-      body = AmplitudeAPI.body("test_event", "user_id", {foo: "bar"})
+      event = AmplitudeAPI::Event.new(user_id: @user, event_type: "test_event", event_properties: {test_property: 1})
+      body = AmplitudeAPI.body(event)
       expect(body[:api_key]).to eq('stub api key')
     end
 
     it "should create an event" do
-      body = AmplitudeAPI.body("test_event", 23, {foo: "bar"})
-      expected = JSON.generate({event_type: "test_event", user_id: 23, event_properties: {foo: "bar"}})
+      event = AmplitudeAPI::Event.new(user_id: 23, event_type: "test_event", event_properties: {foo: "bar"})
+      body = AmplitudeAPI.body(event)
+
+      expected = JSON.generate([{event_type: "test_event", user_id: 23, event_properties: {foo: "bar"}}])
       expect(body[:event]).to eq(expected)
     end
   end

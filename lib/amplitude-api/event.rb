@@ -24,5 +24,13 @@ class AmplitudeAPI
         event_properties: self.event_properties
       }
     end
+
+    def ==(other)
+      if other.respond_to?(:to_hash)
+        self.to_hash == other.to_hash
+      else
+        false
+      end
+    end
   end
 end
