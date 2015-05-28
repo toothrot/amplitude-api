@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Alex Rakoczy"]
   spec.email         = ["arakoczy@gmail.com"]
   spec.summary       = %q{Send events to the Amplitude API}
-  spec.description   = %q{}
+  spec.description   = %q{Provides an integration for sending events to Amplitude}
   spec.homepage      = "https://github.com/toothrot/amplitude-api"
   spec.license       = "MIT"
 
