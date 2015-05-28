@@ -29,6 +29,6 @@ PLATFORMS
 
 DEPENDENCIES
   pry (~> 0.9.12.6)
-  rake (> 10.0)
-  rspec (~> 2.99.0)
+  rake (>= 10.0)
+  rspec (>= 2.99.0)
   typhoeus (~> 0.7.1)
