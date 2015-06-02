@@ -10,6 +10,8 @@ gem install amplitude-api
 
 ## Basic Usage
 
+The following code snippet will immediately track an event to the Amplitude API. The time on the event will automatically be the time of the request.
+
 ```ruby
 # Configure your Amplitude API key
 AmplitudeAPI.api_key = "abcdef123456"
@@ -24,3 +26,13 @@ event = AmplitudeAPI::Event.new({
 })
 AmplitudeAPI.track(event)
 ```
+
+## What's Next
+
+* Thread support for background dispatching in bulk
+* `device_id` support as an alternative to `user_id`
+* Configurable default account to use when no `user_id` present
+ 
+## Contributing
+
+I'd love to hear how you're using this. Please check out the [issues](https://github.com/toothrot/amplitude-api/issues).
