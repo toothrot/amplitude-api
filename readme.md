@@ -27,6 +27,8 @@ event = AmplitudeAPI::Event.new({
 AmplitudeAPI.track(event)
 ```
 
+Currently, we are using this in Rails and using ActiveJob to dispatch events asynchronously. I plan on moving background/asynchronous support into this gem.
+
 ## What's Next
 
 * Thread support for background dispatching in bulk
