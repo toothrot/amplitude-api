@@ -45,10 +45,10 @@ class AmplitudeAPI
       }
     end
 
-    # @overload body(event)
+    # @overload track(event)
     #   @param [ AmplitudeAPI::Event ] Send a single event to the Amplitude API
     #
-    # @overload body([events])
+    # @overload track([events])
     #   @param [ Array<AmplitudeAPI::Event> ] Send an array of events in a single request to Amplitude
     #
     # @return [ Typhoeus::Response ] 
