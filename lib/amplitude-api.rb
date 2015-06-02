@@ -1,6 +1,6 @@
 require 'json'
 require 'bundler/setup'
-Bundler.require(:default)
+require 'typhoeus'
 require 'amplitude-api/event'
 
 class AmplitudeAPI
