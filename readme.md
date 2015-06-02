@@ -32,6 +32,10 @@ AmplitudeAPI.track(event)
 * Thread support for background dispatching in bulk
 * `device_id` support as an alternative to `user_id`
 * Configurable default account to use when no `user_id` present
+
+## Other useful resources
+* [Amplitude HTTP Api Documentation](https://amplitude.zendesk.com/hc/en-us/articles/204771828)
+* [Segment.io Amplitude integration](https://segment.com/docs/integrations/amplitude/)
  
 ## Contributing
 
