@@ -15,7 +15,7 @@ class AmplitudeAPI
     # @param [ String ] user_id a user_id to associate with the event
     # @param [ String ] event_type a name for the event
     # @param [ Hash ] event_properties various properties to attach to the event
-    def initialize(user_id:{} , event_type: {}, event_properties: {})
+    def initialize(user_id: "" , event_type: "", event_properties: {})
       self.user_id = user_id
       self.event_type = event_type
       self.event_properties = event_properties
