@@ -30,6 +30,26 @@ describe AmplitudeAPI do
     end
   end
 
+  describe ".initializer " do
+    it "initializes event without parameter" do
+      event = AmplitudeAPI::Event.new()
+      expect(event.to_hash).to eq({
+        event_type: "",
+        user_id: "",
+        event_properties: {}
+      })
+    end
+
+    it "initializes event with parameter" do
+      event = AmplitudeAPI::Event.new(user_id: 123, event_type: "test_event", event_properties: {test_property: 1})
+      expect(event.to_hash).to eq({
+        event_type: "test_event",
+        user_id: 123,
+        event_properties: {test_property: 1}
+      })
+    end
+  end
+
   describe ".send_event" do
     it "sends an event to AmplitudeAPI" do
       event = AmplitudeAPI::Event.new(user_id: @user, event_type: "test_event", event_properties: {test_property: 1})
