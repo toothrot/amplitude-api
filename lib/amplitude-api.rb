@@ -25,6 +25,11 @@ class AmplitudeAPI
       track(event)
     end
 
+    def send_identify(user_id, properties = {})
+      identify = AmplitudeAPI::Identify.new(user_id, properties)
+      # Send identify request here
+    end
+
     # @overload body(event)
     #   @param [ AmplitudeAPI::Event ]
     #
@@ -51,7 +56,7 @@ class AmplitudeAPI
     # @overload track([events])
     #   @param [ Array<AmplitudeAPI::Event> ] Send an array of events in a single request to Amplitude
     #
-    # @return [ Typhoeus::Response ] 
+    # @return [ Typhoeus::Response ]
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
