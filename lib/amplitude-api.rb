@@ -2,10 +2,11 @@ require 'json'
 require 'bundler/setup'
 require 'typhoeus'
 require 'amplitude-api/event'
+require 'amplitude-api/identification'
 
 class AmplitudeAPI
   TRACK_URI_STRING = "https://api.amplitude.com/httpapi"
-  IDENTIFY_URI_STRING = "https://api.amplitude.com/"
+  IDENTIFY_URI_STRING = "https://api.amplitude.com/identify"
 
   USER_WITH_NO_ACCOUNT = "user who doesn't have an account"
 
