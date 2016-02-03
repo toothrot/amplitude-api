@@ -30,6 +30,31 @@ describe AmplitudeAPI do
     end
   end
 
+  describe ".identify" do
+    context "with a single identification" do
+      it "sends the identification to Amplitude" do
+        identification = AmplitudeAPI::Identification.new(user_id: 123, user_properties: {first_name: 'John', last_name: 'Doe'})
+        body = {api_key: AmplitudeAPI.api_key, identification: JSON.generate([identification.to_hash])}
+
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+
+        AmplitudeAPI.identify(identification)
+      end
+    end
+
+    context "with multiple identifications" do
+      it "sends all identifications in a single request" do
+        identification = AmplitudeAPI::Identification.new(user_id: 123, user_properties: {first_name: 'Julian', last_name: 'Ponce'})
+        identification2 = AmplitudeAPI::Identification.new(user_id: 456, user_properties: {first_name: 'John', last_name: 'Doe'})
+        body = {api_key: AmplitudeAPI.api_key, identification: JSON.generate([identification.to_hash, identification2.to_hash])}
+
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+
+        AmplitudeAPI.identify([identification, identification2])
+      end
+    end
+  end
+
   describe ".initializer " do
     it "initializes event without parameter" do
       event = AmplitudeAPI::Event.new()
@@ -73,6 +98,33 @@ describe AmplitudeAPI do
         expect(AmplitudeAPI).to receive(:track).with(event)
 
         AmplitudeAPI.send_event("test_event", @user.id, test_property: 1)
+      end
+    end
+  end
+
+  describe ".send_identify" do
+    it "sends an identify to AmplitudeAPI" do
+      identification = AmplitudeAPI::Identification.new(user_id: @user, user_properties: {first_name: 'John', last_name: 'Doe'})
+      expect(AmplitudeAPI).to receive(:identify).with(identification)
+
+      AmplitudeAPI.send_identify(@user, {first_name: 'John', last_name: 'Doe'})
+    end
+
+    context "the user is nil" do
+      it "sends an identify with the no account user" do
+        identification = AmplitudeAPI::Identification.new(user_id: nil, user_properties: {first_name: 'John', last_name: 'Doe'})
+        expect(AmplitudeAPI).to receive(:identify).with(identification)
+
+        AmplitudeAPI.send_identify(nil, {first_name: 'John', last_name: 'Doe'})
+      end
+    end
+
+    context "the user is a user_id" do
+      it "sends an identify to AmplitudeAPI" do
+        identification = AmplitudeAPI::Identification.new(user_id: 123, user_properties: {first_name: 'John', last_name: 'Doe'})
+        expect(AmplitudeAPI).to receive(:identify).with(identification)
+
+        AmplitudeAPI.send_identify(@user.id, {first_name: 'John', last_name: 'Doe'})
       end
     end
   end

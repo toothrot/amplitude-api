@@ -34,5 +34,16 @@ class AmplitudeAPI
         user_properties: self.user_properties
       }
     end
+
+    # @return [ true, false ]
+    #
+    # Compares +to_hash+ for equality
+    def ==(other)
+      if other.respond_to?(:to_hash)
+        self.to_hash == other.to_hash
+      else
+        false
+      end
+    end
   end
 end
