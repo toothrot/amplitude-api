@@ -11,7 +11,7 @@ describe AmplitudeAPI do
         event = AmplitudeAPI::Event.new(user_id: 123, event_type: 'clicked on sign up')
         body = {api_key: AmplitudeAPI.api_key, event: JSON.generate([event.to_hash])}
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::URI_STRING, body: body)
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
 
         AmplitudeAPI.track(event)
       end
@@ -23,7 +23,7 @@ describe AmplitudeAPI do
         event2 = AmplitudeAPI::Event.new(user_id: 456, event_type: 'liked a widget')
         body = {api_key: AmplitudeAPI.api_key, event: JSON.generate([event.to_hash, event2.to_hash])}
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::URI_STRING, body: body)
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
 
         AmplitudeAPI.track([event, event2])
       end
@@ -80,13 +80,13 @@ describe AmplitudeAPI do
   describe "#body" do
     it "should add an api key" do
       event = AmplitudeAPI::Event.new(user_id: @user, event_type: "test_event", event_properties: {test_property: 1})
-      body = AmplitudeAPI.body(event)
+      body = AmplitudeAPI.track_body(event)
       expect(body[:api_key]).to eq('stub api key')
     end
 
     it "should create an event" do
       event = AmplitudeAPI::Event.new(user_id: 23, event_type: "test_event", event_properties: {foo: "bar"})
-      body = AmplitudeAPI.body(event)
+      body = AmplitudeAPI.track_body(event)
 
       expected = JSON.generate([{event_type: "test_event", user_id: 23, event_properties: {foo: "bar"}}])
       expect(body[:event]).to eq(expected)

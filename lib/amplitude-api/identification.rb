@@ -1,5 +1,5 @@
 class AmplitudeAPI
-  class Identify
+  class Identification
     def initialize(user_id: "", user_properties: {})
       self.user_id = user_id
       self.user_properties = user_properties
