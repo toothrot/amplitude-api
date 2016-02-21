@@ -1,14 +1,15 @@
 require 'json'
 require 'bundler/setup'
 require 'typhoeus'
-require 'amplitude-api/event'
-require 'amplitude-api/identification'
+require 'amplitude_api/event'
+require 'amplitude_api/identification'
 
+# AmplitudeAPI
 class AmplitudeAPI
-  TRACK_URI_STRING = "https://api.amplitude.com/httpapi"
-  IDENTIFY_URI_STRING = "https://api.amplitude.com/identify"
+  TRACK_URI_STRING = 'https://api.amplitude.com/httpapi'.freeze
+  IDENTIFY_URI_STRING = 'https://api.amplitude.com/identify'.freeze
 
-  USER_WITH_NO_ACCOUNT = "user who doesn't have an account"
+  USER_WITH_NO_ACCOUNT = "user who doesn't have an account".freeze
 
   class << self
     # @!attribute [ rw ] api_key
@@ -21,14 +22,18 @@ class AmplitudeAPI
     #
     # @param [ String ] event_name a string that describes the event, e.g. "clicked on Home"
     # @param [ String ] user a string or integer that uniquely identifies a user.
-    # @param [ Hash ] properties a hash that is serialized to JSON, and can contain any other property to be stored on the Event
+    # @param [ Hash ] properties a hash that is serialized to JSON,
+    # and can contain any other property to be stored on the Event
     #
     # @return [ Typhoeus::Response ]
     def send_event(event_name, user, properties = {})
-      event = AmplitudeAPI::Event.new(user_id: user, event_type: event_name, event_properties: properties)
+      event = AmplitudeAPI::Event.new(
+        user_id: user,
+        event_type: event_name,
+        event_properties: properties
+      )
       track(event)
     end
-
 
     # @overload track_body(event)
     #   @param [ AmplitudeAPI::Event ]
@@ -41,16 +46,13 @@ class AmplitudeAPI
     # Converts a series of AmplitudeAPI::Event objects into a body
     # suitable for the Amplitude API
     def track_body(*events)
-      event_body = events.flatten.map do |event|
-        event.to_hash
-      end
+      event_body = events.flatten.map(&:to_hash)
 
       {
-        api_key: self.api_key,
+        api_key: api_key,
         event: JSON.generate(event_body)
       }
     end
-
 
     # @overload track(event)
     #   @param [ AmplitudeAPI::Event ] Send a single event to the Amplitude API
@@ -83,12 +85,10 @@ class AmplitudeAPI
     # Converts a series of AmplitudeAPI::Identification objects into a body
     # suitable for the Amplitude Identify API
     def identify_body(*identifications)
-      identification_body = identifications.flatten.map do |identification|
-        identification.to_hash
-      end
+      identification_body = identifications.flatten.map(&:to_hash)
 
       {
-        api_key: self.api_key,
+        api_key: api_key,
         identification: JSON.generate(identification_body)
       }
     end

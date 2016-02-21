@@ -1,4 +1,5 @@
 class AmplitudeAPI
+  # AmplitudeAPI::Identification
   class Identification
     # @!attribute [ rw ] user_id
     #   @return [ String ] the user_id to be sent to Amplitude
@@ -11,7 +12,7 @@ class AmplitudeAPI
     #
     # @param [ String ] user_id a user_id to associate with the identification
     # @param [ Hash ] user_properties various properties to attach to the user identification
-    def initialize(user_id: "", user_properties: {})
+    def initialize(user_id: '', user_properties: {})
       self.user_id = user_id
       self.user_properties = user_properties
     end
@@ -30,8 +31,8 @@ class AmplitudeAPI
     # Used for serialization and comparison
     def to_hash
       {
-        user_id: self.user_id,
-        user_properties: self.user_properties
+        user_id: user_id,
+        user_properties: user_properties
       }
     end
 
@@ -40,7 +41,7 @@ class AmplitudeAPI
     # Compares +to_hash+ for equality
     def ==(other)
       if other.respond_to?(:to_hash)
-        self.to_hash == other.to_hash
+        to_hash == other.to_hash
       else
         false
       end
