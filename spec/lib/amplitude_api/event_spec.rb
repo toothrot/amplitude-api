@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 describe AmplitudeAPI::Event do
-  User = Struct.new(:id)
+  user = Struct.new(:id)
 
   context 'with a user object' do
     describe '#body' do
       it "populates with the user's id" do
-        event = AmplitudeAPI::Event.new(
-          user_id: User.new(123),
+        event = described_class.new(
+          user_id: user.new(123),
           event_type: 'clicked on home'
         )
         expect(event.to_hash[:user_id]).to eq(123)
@@ -18,7 +18,7 @@ describe AmplitudeAPI::Event do
   context 'with a user id' do
     describe '#body' do
       it "populates with the user's id" do
-        event = AmplitudeAPI::Event.new(
+        event = described_class.new(
           user_id: 123,
           event_type: 'clicked on home'
         )
@@ -30,7 +30,7 @@ describe AmplitudeAPI::Event do
   context 'without a user' do
     describe '#body' do
       it 'populates with the unknown user' do
-        event = AmplitudeAPI::Event.new(
+        event = described_class.new(
           user_id: nil,
           event_type: 'clicked on home'
         )
@@ -41,7 +41,7 @@ describe AmplitudeAPI::Event do
 
   describe '#body' do
     it 'includes the event type' do
-      event = AmplitudeAPI::Event.new(
+      event = described_class.new(
         user_id: 123,
         event_type: 'clicked on home'
       )
@@ -49,7 +49,7 @@ describe AmplitudeAPI::Event do
     end
 
     it 'includes arbitrary properties' do
-      event = AmplitudeAPI::Event.new(
+      event = described_class.new(
         user_id: 123,
         event_type: 'clicked on home',
         event_properties: { abc: :def }
@@ -59,7 +59,7 @@ describe AmplitudeAPI::Event do
 
     it 'includes a time for the event' do
       time = Time.parse('2016-01-01 00:00:00 -0000')
-      event = AmplitudeAPI::Event.new(
+      event = described_class.new(
         user_id: 123,
         event_type: 'clicked on home',
         time: time
@@ -68,7 +68,7 @@ describe AmplitudeAPI::Event do
     end
 
     it 'does not include time if it is not set' do
-      event = AmplitudeAPI::Event.new(
+      event = described_class.new(
         user_id: 123,
         event_type: 'clicked on home'
       )
