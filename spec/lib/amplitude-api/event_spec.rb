@@ -56,5 +56,23 @@ describe AmplitudeAPI::Event do
       )
       expect(event.to_hash[:event_properties]).to eq(abc: :def)
     end
+
+    it 'includes a time for the event' do
+      time = Time.parse('2016-01-01 00:00:00 -0000')
+      event = AmplitudeAPI::Event.new(
+        user_id: 123,
+        event_type: 'clicked on home',
+        time: time
+      )
+      expect(event.to_hash[:time]).to eq(1_451_606_400_000)
+    end
+
+    it 'does not include time if it is not set' do
+      event = AmplitudeAPI::Event.new(
+        user_id: 123,
+        event_type: 'clicked on home'
+      )
+      expect(event.to_hash).not_to have_key(:time)
+    end
   end
 end

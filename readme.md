@@ -18,7 +18,7 @@ AmplitudeAPI.api_key = "abcdef123456"
 
 event = AmplitudeAPI::Event.new({
   user_id: "123",
-  event_type: "clicked on Home",
+  event_type: "clicked on home",
   event_properties: {
     cause: "button",
     arbitrary: "properties"
