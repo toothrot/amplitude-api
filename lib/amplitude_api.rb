@@ -1,8 +1,8 @@
 require 'json'
 require 'bundler/setup'
 require 'typhoeus'
-require 'amplitude_api/event'
-require 'amplitude_api/identification'
+require_relative 'amplitude_api/event'
+require_relative 'amplitude_api/identification'
 
 # AmplitudeAPI
 class AmplitudeAPI
