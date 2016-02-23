@@ -98,7 +98,8 @@ describe AmplitudeAPI do
       expect(event.to_hash).to eq(
         event_type: '',
         user_id: '',
-        event_properties: {}
+        event_properties: {},
+        user_properties: {}
       )
     end
 
@@ -113,7 +114,8 @@ describe AmplitudeAPI do
       expect(event.to_hash).to eq(
         event_type: 'test_event',
         user_id: 123,
-        event_properties: { test_property: 1 }
+        event_properties: { test_property: 1 },
+        user_properties: {}
       )
     end
   end
@@ -127,7 +129,7 @@ describe AmplitudeAPI do
       )
       expect(described_class).to receive(:track).with(event)
 
-      described_class.send_event('test_event', user, test_property: 1)
+      described_class.send_event('test_event', user, event_properties: {test_property: 1})
     end
 
     context 'the user is nil' do
@@ -139,7 +141,7 @@ describe AmplitudeAPI do
         )
         expect(described_class).to receive(:track).with(event)
 
-        described_class.send_event('test_event', nil, test_property: 1)
+        described_class.send_event('test_event', nil, event_properties: {test_property: 1})
       end
     end
 
@@ -152,7 +154,24 @@ describe AmplitudeAPI do
         )
         expect(described_class).to receive(:track).with(event)
 
-        described_class.send_event('test_event', user.id, test_property: 1)
+        described_class.send_event('test_event', user.id, event_properties: {test_property: 1})
+      end
+
+      it 'sends arbitrary user_properties to AmplitudeAPI' do
+        event = AmplitudeAPI::Event.new(
+          user_id: 123,
+          event_type: 'test_event',
+          event_properties: { test_property: 1 },
+          user_properties: { test_user_property: 'abc' }
+        )
+        expect(described_class).to receive(:track).with(event)
+
+        described_class.send_event(
+          'test_event',
+          user.id,
+          event_properties: {test_property: 1},
+          user_properties: { test_user_property: 'abc' }
+        )
       end
     end
   end
@@ -221,6 +240,9 @@ describe AmplitudeAPI do
         event_type: 'test_event',
         event_properties: {
           foo: 'bar'
+        },
+        user_properties: {
+          abc: '123'
         }
       )
       body = described_class.track_body(event)
@@ -232,6 +254,9 @@ describe AmplitudeAPI do
             user_id: 23,
             event_properties: {
               foo: 'bar'
+            },
+            user_properties: {
+              abc: '123'
             }
           }
         ]
