@@ -22,15 +22,18 @@ class AmplitudeAPI
     #
     # @param [ String ] event_name a string that describes the event, e.g. "clicked on Home"
     # @param [ String ] user a string or integer that uniquely identifies a user.
-    # @param [ Hash ] properties a hash that is serialized to JSON,
+    # @param [ Hash ] event_properties a hash that is serialized to JSON,
     # and can contain any other property to be stored on the Event
+    # @param [ Hash ] user_properties a hash that is serialized to JSON,
+    # and contains user properties to be associated with the user
     #
     # @return [ Typhoeus::Response ]
-    def send_event(event_name, user, properties = {})
+    def send_event(event_name, user, event_properties: {}, user_properties: {})
       event = AmplitudeAPI::Event.new(
         user_id: user,
         event_type: event_name,
-        event_properties: properties
+        event_properties: event_properties,
+        user_properties: user_properties
       )
       track(event)
     end
