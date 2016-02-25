@@ -129,7 +129,7 @@ describe AmplitudeAPI do
       )
       expect(described_class).to receive(:track).with(event)
 
-      described_class.send_event('test_event', user, event_properties: {test_property: 1})
+      described_class.send_event('test_event', user, event_properties: { test_property: 1 })
     end
 
     context 'the user is nil' do
@@ -141,7 +141,7 @@ describe AmplitudeAPI do
         )
         expect(described_class).to receive(:track).with(event)
 
-        described_class.send_event('test_event', nil, event_properties: {test_property: 1})
+        described_class.send_event('test_event', nil, event_properties: { test_property: 1 })
       end
     end
 
@@ -154,7 +154,7 @@ describe AmplitudeAPI do
         )
         expect(described_class).to receive(:track).with(event)
 
-        described_class.send_event('test_event', user.id, event_properties: {test_property: 1})
+        described_class.send_event('test_event', user.id, event_properties: { test_property: 1 })
       end
 
       it 'sends arbitrary user_properties to AmplitudeAPI' do
@@ -169,7 +169,7 @@ describe AmplitudeAPI do
         described_class.send_event(
           'test_event',
           user.id,
-          event_properties: {test_property: 1},
+          event_properties: { test_property: 1 },
           user_properties: { test_user_property: 'abc' }
         )
       end
