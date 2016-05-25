@@ -11,7 +11,7 @@ gem install amplitude-api
 
 ## Basic Usage
 
-The following code snippet will immediately track an event to the Amplitude API. The time on the event will automatically be the time of the request.
+The following code snippet will immediately track an event to the Amplitude API.
 
 ```ruby
 # Configure your Amplitude API key
@@ -20,6 +20,7 @@ AmplitudeAPI.api_key = "abcdef123456"
 event = AmplitudeAPI::Event.new({
   user_id: "123",
   event_type: "clicked on home",
+  time: Time.now,
   event_properties: {
     cause: "button",
     arbitrary: "properties"
