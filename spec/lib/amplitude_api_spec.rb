@@ -99,7 +99,8 @@ describe AmplitudeAPI do
         event_type: '',
         user_id: '',
         event_properties: {},
-        user_properties: {}
+        user_properties: {},
+        ip: ''
       )
     end
 
@@ -109,13 +110,15 @@ describe AmplitudeAPI do
         event_type: 'test_event',
         event_properties: {
           test_property: 1
-        }
+        },
+        ip: '8.8.8.8'
       )
       expect(event.to_hash).to eq(
         event_type: 'test_event',
         user_id: 123,
         event_properties: { test_property: 1 },
-        user_properties: {}
+        user_properties: {},
+        ip: '8.8.8.8'
       )
     end
   end
@@ -243,7 +246,8 @@ describe AmplitudeAPI do
         },
         user_properties: {
           abc: '123'
-        }
+        },
+        ip: '8.8.8.8'
       )
       body = described_class.track_body(event)
 
@@ -257,7 +261,8 @@ describe AmplitudeAPI do
             },
             user_properties: {
               abc: '123'
-            }
+            },
+            ip: '8.8.8.8'
           }
         ]
       )

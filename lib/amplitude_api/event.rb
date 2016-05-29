@@ -16,6 +16,9 @@ class AmplitudeAPI
     # @!attribute [ rw ] time
     #   @return [ Time ] Time that the event occurred (defaults to now)
     attr_accessor :time
+    # @!attribute [ rw ] ip
+    #   @return [ String ] IP address of the user
+    attr_accessor :ip
 
     # Create a new Event
     #
@@ -23,12 +26,14 @@ class AmplitudeAPI
     # @param [ String ] event_type a name for the event
     # @param [ Hash ] event_properties various properties to attach to the event
     # @param [ Time ] Time that the event occurred (defaults to now)
-    def initialize(user_id: '', event_type: '', event_properties: {}, user_properties: {}, time: nil)
-      self.user_id = user_id
-      self.event_type = event_type
-      self.event_properties = event_properties
-      self.user_properties = user_properties
-      self.time = time
+    # @param [ String ] IP address of the user
+    def initialize(options = {})
+      self.user_id = options.fetch(:user_id, '')
+      self.event_type = options.fetch(:event_type, '')
+      self.event_properties = options.fetch(:event_properties, {})
+      self.user_properties = options.fetch(:user_properties, {})
+      self.time = options[:time]
+      self.ip = options.fetch(:ip, '')
     end
 
     def user_id=(value)
@@ -50,6 +55,7 @@ class AmplitudeAPI
       serialized_event[:event_properties] = event_properties
       serialized_event[:user_properties] = user_properties
       serialized_event[:time] = formatted_time if time
+      serialized_event[:ip] = ip if ip
       serialized_event
     end
 
