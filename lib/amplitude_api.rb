@@ -28,12 +28,12 @@ class AmplitudeAPI
     # and contains user properties to be associated with the user
     #
     # @return [ Typhoeus::Response ]
-    def send_event(event_name, user, event_properties: {}, user_properties: {})
+    def send_event(event_name, user, options = {})
       event = AmplitudeAPI::Event.new(
         user_id: user,
         event_type: event_name,
-        event_properties: event_properties,
-        user_properties: user_properties
+        event_properties: options.fetch(:event_properties, {}),
+        user_properties: options.fetch(:user_properties, {})
       )
       track(event)
     end
