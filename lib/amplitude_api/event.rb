@@ -20,13 +20,32 @@ class AmplitudeAPI
     #   @return [ String ] IP address of the user
     attr_accessor :ip
 
+    # @!attribute [ rw ] price
+    #   @return [ String ] (required for revenue data) price of the item purchased
+    attr_accessor :price
+
+    # @!attribute [ rw ] quantity
+    #   @return [ String ] (required for revenue data, defaults to 1 if not specified) quantity of the item purchased
+    attr_accessor :quantity
+
+    # @!attribute [ rw ] product_id
+    #   @return [ String ] an identifier for the product. (Note: you must send a price and quantity with this field)
+    attr_accessor :product_id
+
+    # @!attribute [ rw ] revenue_type
+    #   @return [ String ] type of revenue. (Note: you must send a price and quantity with this field)
+    attr_accessor :revenue_type
+
     # Create a new Event
     #
     # @param [ String ] user_id a user_id to associate with the event
     # @param [ String ] event_type a name for the event
     # @param [ Hash ] event_properties various properties to attach to the event
     # @param [ Time ] Time that the event occurred (defaults to now)
-    # @param [ String ] IP address of the user
+    # @param [ Double ] price (optional, but required for revenue data) price of the item purchased
+    # @param [ Integer ] quantity (optional, but required for revenue data) quantity of the item purchased
+    # @param [ String ] product_id (optional) an identifier for the product.
+    # @param [ String ] revenue_type (optional) type of revenue
     def initialize(options = {})
       self.user_id = options.fetch(:user_id, '')
       self.event_type = options.fetch(:event_type, '')
@@ -34,6 +53,7 @@ class AmplitudeAPI
       self.user_properties = options.fetch(:user_properties, {})
       self.time = options[:time]
       self.ip = options.fetch(:ip, '')
+      validate_revenue_arguments(options)
     end
 
     def user_id=(value)
@@ -56,7 +76,8 @@ class AmplitudeAPI
       serialized_event[:user_properties] = user_properties
       serialized_event[:time] = formatted_time if time
       serialized_event[:ip] = ip if ip
-      serialized_event
+
+      serialized_event.merge(revenue_hash)
     end
 
     # @return [ true, false ]
@@ -74,6 +95,25 @@ class AmplitudeAPI
 
     def formatted_time
       time.to_i * 1_000
+    end
+
+    def validate_revenue_arguments(options)
+      self.price = options[:price]
+      self.quantity = options[:quantity] || 1 if price
+      self.product_id = options[:product_id]
+      self.revenue_type = options[:revenue_type]
+      return if price
+      raise ArgumentError, 'You must provide a price in order to use the product_id' if product_id
+      raise ArgumentError, 'You must provide a price in order to use the revenue_type' if revenue_type
+    end
+
+    def revenue_hash
+      revenue_hash = {}
+      revenue_hash[:productId] = product_id if product_id
+      revenue_hash[:revenueType] = revenue_type if revenue_type
+      revenue_hash[:quantity] = quantity if quantity
+      revenue_hash[:price] = price if price
+      revenue_hash
     end
   end
 end
