@@ -42,23 +42,23 @@ describe AmplitudeAPI::Event do
   describe 'init' do
     context 'the user does not send in a price' do
       it 'raises an error if the user sends in a product_id' do
-        expect {
+        expect do
           described_class.new(
             user_id: 123,
             event_type: 'bad event',
-            product_id: "hopscotch.4lyfe"
+            product_id: 'hopscotch.4lyfe'
           )
-        }.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError)
       end
 
       it 'raises an error if the user sends in a revenue_type' do
-        expect {
+        expect do
           described_class.new(
             user_id: 123,
             event_type: 'bad event',
-            revenue_type: "tax return"
+            revenue_type: 'tax return'
           )
-        }.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError)
       end
     end
   end
@@ -99,12 +99,11 @@ describe AmplitudeAPI::Event do
         )
         expect(event.to_hash).not_to have_key(:time)
       end
-
     end
 
     describe 'revenue params' do
       it 'includes the price if it is set' do
-        price = 100000.99
+        price = 100_000.99
         event = described_class.new(
           user_id: 123,
           event_type: 'clicked on home',
@@ -114,7 +113,7 @@ describe AmplitudeAPI::Event do
       end
 
       it 'sets the quantity to 1 if the price is set and the quantity is not' do
-        price = 100000.99
+        price = 100_000.99
         event = described_class.new(
           user_id: 123,
           event_type: 'clicked on home',
@@ -123,7 +122,7 @@ describe AmplitudeAPI::Event do
         expect(event.to_hash[:quantity]).to eq(1)
       end
 
-      it "includes the quantity if it is set" do
+      it 'includes the quantity if it is set' do
         quantity = 100
         event = described_class.new(
           user_id: 123,
@@ -134,9 +133,8 @@ describe AmplitudeAPI::Event do
         expect(event.to_hash[:quantity]).to eq(quantity)
       end
 
-
       it 'includes the productID if set' do
-        product_id = "hopscotch.subscriptions.rule"
+        product_id = 'hopscotch.subscriptions.rule'
         event = described_class.new(
           user_id: 123,
           event_type: 'clicked on home',
@@ -147,7 +145,7 @@ describe AmplitudeAPI::Event do
       end
 
       it 'includes the revenueType if set' do
-        revenue_type = "income"
+        revenue_type = 'income'
         event = described_class.new(
           user_id: 123,
           event_type: 'clicked on home',
@@ -157,17 +155,16 @@ describe AmplitudeAPI::Event do
         expect(event.to_hash[:revenueType]).to eq(revenue_type)
       end
 
-      it "does not include revenue params if they are not set" do
+      it 'does not include revenue params if they are not set' do
         event = described_class.new(
           user_id: 123,
-          event_type: 'clicked on home',
+          event_type: 'clicked on home'
         )
         expect(event.to_hash).not_to have_key(:quantity)
         expect(event.to_hash).not_to have_key(:revenueType)
         expect(event.to_hash).not_to have_key(:productId)
         expect(event.to_hash).not_to have_key(:price)
       end
-
     end
   end
 end
