@@ -101,6 +101,25 @@ describe AmplitudeAPI::Event do
       end
     end
 
+    describe 'insert_id' do
+      it 'includes an insert_id for the event' do
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'clicked on home',
+          insert_id: 'foo-bar'
+        )
+        expect(event.to_hash[:insert_id]).to eq('foo-bar')
+      end
+
+      it 'does not include insert_id if it is not set' do
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'clicked on home'
+        )
+        expect(event.to_hash).not_to have_key(:insert_id)
+      end
+    end
+
     describe 'revenue params' do
       it 'includes the price if it is set' do
         price = 100_000.99
