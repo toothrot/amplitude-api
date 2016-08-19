@@ -20,6 +20,10 @@ class AmplitudeAPI
     #   @return [ String ] IP address of the user
     attr_accessor :ip
 
+    # @!attribute [ rw ] insert_id
+    #   @return [ String ] the unique identifier to be sent to Amplitude
+    attr_accessor :insert_id
+
     # @!attribute [ rw ] price
     #   @return [ String ] (required for revenue data) price of the item purchased
     attr_accessor :price
@@ -46,6 +50,8 @@ class AmplitudeAPI
     # @param [ Integer ] quantity (optional, but required for revenue data) quantity of the item purchased
     # @param [ String ] product_id (optional) an identifier for the product.
     # @param [ String ] revenue_type (optional) type of revenue
+    # @param [ String ] IP address of the user
+    # @param [ String ] insert_id a unique identifier for the event
     def initialize(options = {})
       self.user_id = options.fetch(:user_id, '')
       self.event_type = options.fetch(:event_type, '')
@@ -53,6 +59,7 @@ class AmplitudeAPI
       self.user_properties = options.fetch(:user_properties, {})
       self.time = options[:time]
       self.ip = options.fetch(:ip, '')
+      self.insert_id = options[:insert_id]
       validate_revenue_arguments(options)
     end
 
@@ -76,6 +83,7 @@ class AmplitudeAPI
       serialized_event[:user_properties] = user_properties
       serialized_event[:time] = formatted_time if time
       serialized_event[:ip] = ip if ip
+      serialized_event[:insert_id] = insert_id if insert_id
 
       serialized_event.merge(revenue_hash)
     end

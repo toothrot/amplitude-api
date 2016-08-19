@@ -21,6 +21,7 @@ event = AmplitudeAPI::Event.new({
   user_id: "123",
   event_type: "clicked on home",
   time: Time.now,
+  insert_id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
   event_properties: {
     cause: "button",
     arbitrary: "properties"
@@ -40,7 +41,7 @@ Currently, we are using this in Rails and using ActiveJob to dispatch events asy
 ## Other useful resources
 * [Amplitude HTTP Api Documentation](https://amplitude.zendesk.com/hc/en-us/articles/204771828)
 * [Segment.io Amplitude integration](https://segment.com/docs/integrations/amplitude/)
- 
+
 ## Contributing
 
 I'd love to hear how you're using this. Please check out the [issues](https://github.com/toothrot/amplitude-api/issues).
