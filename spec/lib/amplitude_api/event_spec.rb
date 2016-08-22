@@ -42,12 +42,13 @@ describe AmplitudeAPI::Event do
   describe 'init' do
     context 'attributes' do
       it 'accepts string attributes' do
+        time = Time.parse('2016-01-01 00:00:00 -0000')
         event = described_class.new(
           'user_id' => 123,
           'event_type' => 'sausage',
           'event_properties' => { 'a' => 'b' },
           'user_properties' => { 'c' => 'd' },
-          'time' => Date.civil(2000, 1, 1).to_time,
+          'time' => time,
           'ip' => '127.0.0.1',
           'insert_id' => 'bestId'
         )
@@ -56,18 +57,19 @@ describe AmplitudeAPI::Event do
                                     user_id: 123,
                                     event_properties: { 'a' => 'b' },
                                     user_properties: { 'c' => 'd' },
-                                    time: 946_702_800_000,
+                                    time: 1_451_606_400_000,
                                     ip: '127.0.0.1',
                                     insert_id: 'bestId')
       end
 
       it 'accepts symbol attributes' do
+        time = Time.parse('2016-01-01 00:00:00 -0000')
         event = described_class.new(
           user_id: 123,
           event_type: 'sausage',
           event_properties: { 'a' => 'b' },
           user_properties: { 'c' => 'd' },
-          time: Date.civil(2000, 1, 1).to_time,
+          time: time,
           ip: '127.0.0.1',
           insert_id: 'bestId'
         )
@@ -76,7 +78,7 @@ describe AmplitudeAPI::Event do
                                     user_id: 123,
                                     event_properties: { 'a' => 'b' },
                                     user_properties: { 'c' => 'd' },
-                                    time: 946_702_800_000,
+                                    time: 1_451_606_400_000,
                                     ip: '127.0.0.1',
                                     insert_id: 'bestId')
       end
