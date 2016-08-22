@@ -40,6 +40,48 @@ describe AmplitudeAPI::Event do
   end
 
   describe 'init' do
+    context 'attributes' do
+      it 'accepts string attributes' do
+        event = described_class.new(
+          'user_id' => 123,
+          'event_type' => 'sausage',
+          'event_properties' => { 'a' => 'b' },
+          'user_properties' => { 'c' => 'd' },
+          'time' => Date.civil(2000, 1, 1).to_time,
+          'ip' => '127.0.0.1',
+          'insert_id' => 'bestId'
+        )
+
+        expect(event.to_hash).to eq(event_type: 'sausage',
+                                    user_id: 123,
+                                    event_properties: { 'a' => 'b' },
+                                    user_properties: { 'c' => 'd' },
+                                    time: 946_702_800_000,
+                                    ip: '127.0.0.1',
+                                    insert_id: 'bestId')
+      end
+
+      it 'accepts symbol attributes' do
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'sausage',
+          event_properties: { 'a' => 'b' },
+          user_properties: { 'c' => 'd' },
+          time: Date.civil(2000, 1, 1).to_time,
+          ip: '127.0.0.1',
+          insert_id: 'bestId'
+        )
+
+        expect(event.to_hash).to eq(event_type: 'sausage',
+                                    user_id: 123,
+                                    event_properties: { 'a' => 'b' },
+                                    user_properties: { 'c' => 'd' },
+                                    time: 946_702_800_000,
+                                    ip: '127.0.0.1',
+                                    insert_id: 'bestId')
+      end
+    end
+
     context 'the user does not send in a price' do
       it 'raises an error if the user sends in a product_id' do
         expect do
@@ -63,7 +105,7 @@ describe AmplitudeAPI::Event do
     end
   end
 
-  describe '#body' do
+  describe '#to_hash' do
     it 'includes the event type' do
       event = described_class.new(
         user_id: 123,

@@ -52,15 +52,15 @@ class AmplitudeAPI
     # @param [ String ] revenue_type (optional) type of revenue
     # @param [ String ] IP address of the user
     # @param [ String ] insert_id a unique identifier for the event
-    def initialize(options = {})
-      self.user_id = options.fetch(:user_id, '')
-      self.event_type = options.fetch(:event_type, '')
-      self.event_properties = options.fetch(:event_properties, {})
-      self.user_properties = options.fetch(:user_properties, {})
-      self.time = options[:time]
-      self.ip = options.fetch(:ip, '')
-      self.insert_id = options[:insert_id]
-      validate_revenue_arguments(options)
+    def initialize(attributes = {})
+      self.user_id = getopt(attributes, :user_id, '')
+      self.event_type = getopt(attributes, :event_type, '')
+      self.event_properties = getopt(attributes, :event_properties, {})
+      self.user_properties = getopt(attributes, :user_properties, {})
+      self.time = getopt(attributes, :time)
+      self.ip = getopt(attributes, :ip, '')
+      self.insert_id = getopt(attributes, :insert_id)
+      validate_revenue_arguments(attributes)
     end
 
     def user_id=(value)
@@ -106,10 +106,10 @@ class AmplitudeAPI
     end
 
     def validate_revenue_arguments(options)
-      self.price = options[:price]
-      self.quantity = options[:quantity] || 1 if price
-      self.product_id = options[:product_id]
-      self.revenue_type = options[:revenue_type]
+      self.price = getopt(options, :price)
+      self.quantity = getopt(options, :quantity, 1) if price
+      self.product_id = getopt(options, :product_id)
+      self.revenue_type = getopt(options, :revenue_type)
       return if price
       raise ArgumentError, 'You must provide a price in order to use the product_id' if product_id
       raise ArgumentError, 'You must provide a price in order to use the revenue_type' if revenue_type
@@ -122,6 +122,10 @@ class AmplitudeAPI
       revenue_hash[:quantity] = quantity if quantity
       revenue_hash[:price] = price if price
       revenue_hash
+    end
+
+    def getopt(options, key, default = nil)
+      options.fetch(key.to_sym, options.fetch(key.to_s, default))
     end
   end
 end
