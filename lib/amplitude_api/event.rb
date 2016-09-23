@@ -84,14 +84,19 @@ class AmplitudeAPI
       serialized_event = {}
       serialized_event[:event_type] = event_type
       serialized_event[:user_id] = user_id
-      serialized_event[:device_id] = device_id if device_id
       serialized_event[:event_properties] = event_properties
       serialized_event[:user_properties] = user_properties
+      serialized_event = add_optional_properties(serialized_event)
+      serialized_event.merge(revenue_hash)
+    end
+
+    # @return [ Hash ] A serialized Event with optional properties
+    def add_optional_properties(serialized_event)
+      serialized_event[:device_id] = device_id if device_id
       serialized_event[:time] = formatted_time if time
       serialized_event[:ip] = ip if ip
       serialized_event[:insert_id] = insert_id if insert_id
-
-      serialized_event.merge(revenue_hash)
+      serialized_event
     end
 
     # @return [ true, false ]

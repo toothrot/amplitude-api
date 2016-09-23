@@ -38,7 +38,7 @@ class AmplitudeAPI
       {
         user_id: user_id,
         user_properties: user_properties
-      }.tap {|hsh| hsh[:device_id] = device_id if device_id }
+      }.tap { |hsh| hsh[:device_id] = device_id if device_id }
     end
 
     # @return [ true, false ]

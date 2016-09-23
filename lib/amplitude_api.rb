@@ -75,7 +75,11 @@ class AmplitudeAPI
     # ==== Identification related methods
 
     def send_identify(user_id, device_id, user_properties = {})
-      identification = AmplitudeAPI::Identification.new(user_id: user_id, device_id: device_id, user_properties: user_properties)
+      identification = AmplitudeAPI::Identification.new(
+        user_id: user_id,
+        device_id: device_id,
+        user_properties: user_properties
+      )
       identify(identification)
     end
 

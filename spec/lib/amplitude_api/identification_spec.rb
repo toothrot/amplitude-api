@@ -3,7 +3,6 @@ require 'spec_helper'
 describe AmplitudeAPI::Identification do
   user = Struct.new(:id)
 
-
   context 'with a user object' do
     describe '#body' do
       it "populates with the user's id" do
