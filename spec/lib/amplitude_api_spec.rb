@@ -2,22 +2,58 @@ require 'spec_helper'
 
 describe AmplitudeAPI do
   let(:user) { Struct.new(:id).new(123) }
+  let(:device_id) { 'abcdef' }
 
   describe '.track' do
     context 'with a single event' do
-      it 'sends the event to Amplitude' do
-        event = AmplitudeAPI::Event.new(
-          user_id: 123,
-          event_type: 'clicked on sign up'
-        )
-        body = {
-          api_key: described_class.api_key,
-          event: JSON.generate([event.to_hash])
-        }
+      context 'with only user_id' do
+        it 'sends the event to Amplitude' do
+          event = AmplitudeAPI::Event.new(
+            user_id: 123,
+            event_type: 'clicked on sign up'
+          )
+          body = {
+            api_key: described_class.api_key,
+            event: JSON.generate([event.to_hash])
+          }
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
 
-        described_class.track(event)
+          described_class.track(event)
+        end
+      end
+      context 'with only device_id' do
+        it 'sends the event to Amplitude' do
+          event = AmplitudeAPI::Event.new(
+            device_id: device_id,
+            event_type: 'clicked on sign up'
+          )
+          body = {
+            api_key: described_class.api_key,
+            event: JSON.generate([event.to_hash])
+          }
+
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+
+          described_class.track(event)
+        end
+      end
+      context 'with both user_id and device_id' do
+        it 'sends the event to Amplitude' do
+          event = AmplitudeAPI::Event.new(
+            user_id: 123,
+            device_id: device_id,
+            event_type: 'clicked on sign up'
+          )
+          body = {
+            api_key: described_class.api_key,
+            event: JSON.generate([event.to_hash])
+          }
+
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+
+          described_class.track(event)
+        end
       end
     end
 
@@ -45,22 +81,63 @@ describe AmplitudeAPI do
 
   describe '.identify' do
     context 'with a single identification' do
-      it 'sends the identification to Amplitude' do
-        identification = AmplitudeAPI::Identification.new(
-          user_id: 123,
-          user_properties: {
-            first_name: 'John',
-            last_name: 'Doe'
+      context 'with only user_id' do
+        it 'sends the identification to Amplitude' do
+          identification = AmplitudeAPI::Identification.new(
+            user_id: 123,
+            user_properties: {
+              first_name: 'John',
+              last_name: 'Doe'
+            }
+          )
+          body = {
+            api_key: described_class.api_key,
+            identification: JSON.generate([identification.to_hash])
           }
-        )
-        body = {
-          api_key: described_class.api_key,
-          identification: JSON.generate([identification.to_hash])
-        }
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
 
-        described_class.identify(identification)
+          described_class.identify(identification)
+        end
+      end
+      context 'with only device_id' do
+        it 'sends the identification to Amplitude' do
+          identification = AmplitudeAPI::Identification.new(
+            device_id: device_id,
+            user_properties: {
+              first_name: 'John',
+              last_name: 'Doe'
+            }
+          )
+          body = {
+            api_key: described_class.api_key,
+            identification: JSON.generate([identification.to_hash])
+          }
+
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+
+          described_class.identify(identification)
+        end
+      end
+      context 'with both user_id and device_id' do
+        it 'sends the identification to Amplitude' do
+          identification = AmplitudeAPI::Identification.new(
+            user_id: 123,
+            device_id: device_id,
+            user_properties: {
+              first_name: 'John',
+              last_name: 'Doe'
+            }
+          )
+          body = {
+            api_key: described_class.api_key,
+            identification: JSON.generate([identification.to_hash])
+          }
+
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+
+          described_class.identify(identification)
+        end
       end
     end
 
@@ -74,7 +151,7 @@ describe AmplitudeAPI do
           }
         )
         identification2 = AmplitudeAPI::Identification.new(
-          user_id: 456,
+          device_id: 456,
           user_properties: {
             first_name: 'John',
             last_name: 'Doe'
@@ -121,97 +198,120 @@ describe AmplitudeAPI do
         ip: '8.8.8.8'
       )
     end
+    it 'initializes event with parameter including device_id' do
+      event = AmplitudeAPI::Event.new(
+        user_id: 123,
+        device_id: 'abc',
+        event_type: 'test_event',
+        event_properties: {
+          test_property: 1
+        },
+        ip: '8.8.8.8'
+      )
+      expect(event.to_hash).to eq(
+        event_type: 'test_event',
+        user_id: 123,
+        device_id: 'abc',
+        event_properties: { test_property: 1 },
+        user_properties: {},
+        ip: '8.8.8.8'
+      )
+    end
   end
 
   describe '.send_event' do
-    it 'sends an event to AmplitudeAPI' do
-      event = AmplitudeAPI::Event.new(
-        user_id: user,
-        event_type: 'test_event',
-        event_properties: { test_property: 1 }
-      )
-      expect(described_class).to receive(:track).with(event)
-
-      described_class.send_event('test_event', user, event_properties: { test_property: 1 })
-    end
-
-    context 'the user is nil' do
-      it 'sends an event with the no account user' do
-        event = AmplitudeAPI::Event.new(
-          user_id: nil,
-          event_type: 'test_event',
-          event_properties: { test_property: 1 }
-        )
-        expect(described_class).to receive(:track).with(event)
-
-        described_class.send_event('test_event', nil, event_properties: { test_property: 1 })
-      end
-    end
-
-    context 'the user is a user_id' do
+    context 'with only user_id' do
       it 'sends an event to AmplitudeAPI' do
         event = AmplitudeAPI::Event.new(
-          user_id: 123,
+          user_id: user,
           event_type: 'test_event',
           event_properties: { test_property: 1 }
         )
         expect(described_class).to receive(:track).with(event)
 
-        described_class.send_event('test_event', user.id, event_properties: { test_property: 1 })
+        described_class.send_event('test_event', user, nil, event_properties: { test_property: 1 })
       end
 
-      it 'sends arbitrary user_properties to AmplitudeAPI' do
-        event = AmplitudeAPI::Event.new(
-          user_id: 123,
-          event_type: 'test_event',
-          event_properties: { test_property: 1 },
-          user_properties: { test_user_property: 'abc' }
-        )
-        expect(described_class).to receive(:track).with(event)
+      context 'the user is nil' do
+        it 'sends an event with the no account user' do
+          event = AmplitudeAPI::Event.new(
+            user_id: nil,
+            event_type: 'test_event',
+            event_properties: { test_property: 1 }
+          )
+          expect(described_class).to receive(:track).with(event)
 
-        described_class.send_event(
-          'test_event',
-          user.id,
-          event_properties: { test_property: 1 },
-          user_properties: { test_user_property: 'abc' }
-        )
+          described_class.send_event('test_event', nil, nil, event_properties: { test_property: 1 })
+        end
+      end
+
+      context 'the user is a user_id' do
+        it 'sends an event to AmplitudeAPI' do
+          event = AmplitudeAPI::Event.new(
+            user_id: 123,
+            event_type: 'test_event',
+            event_properties: { test_property: 1 }
+          )
+          expect(described_class).to receive(:track).with(event)
+
+          described_class.send_event('test_event', user.id, nil, event_properties: { test_property: 1 })
+        end
+
+        it 'sends arbitrary user_properties to AmplitudeAPI' do
+          event = AmplitudeAPI::Event.new(
+            user_id: 123,
+            event_type: 'test_event',
+            event_properties: { test_property: 1 },
+            user_properties: { test_user_property: 'abc' }
+          )
+          expect(described_class).to receive(:track).with(event)
+
+          described_class.send_event(
+            'test_event',
+            user.id,
+            nil,
+            event_properties: { test_property: 1 },
+            user_properties: { test_user_property: 'abc' }
+          )
+        end
+      end
+    end
+    context 'with device_id' do
+      context 'the user is not nil' do
+        it 'sends an event to AmplitudeAPI' do
+          event = AmplitudeAPI::Event.new(
+            user_id: user,
+            device_id: device_id,
+            event_type: 'test_event',
+            event_properties: { test_property: 1 }
+          )
+          expect(described_class).to receive(:track).with(event)
+
+          described_class.send_event('test_event', user, device_id, event_properties: { test_property: 1 })
+        end
+      end
+
+      context 'the user is nil' do
+        it 'sends an event with the no account user' do
+          event = AmplitudeAPI::Event.new(
+            user_id: nil,
+            device_id: device_id,
+            event_type: 'test_event',
+            event_properties: { test_property: 1 }
+          )
+          expect(described_class).to receive(:track).with(event)
+
+          described_class.send_event('test_event', nil, device_id, event_properties: { test_property: 1 })
+        end
       end
     end
   end
 
   describe '.send_identify' do
-    it 'sends an identify to AmplitudeAPI' do
-      identification = AmplitudeAPI::Identification.new(
-        user_id: user,
-        user_properties: {
-          first_name: 'John',
-          last_name: 'Doe'
-        }
-      )
-      expect(described_class).to receive(:identify).with(identification)
-
-      described_class.send_identify(user, first_name: 'John', last_name: 'Doe')
-    end
-
-    context 'the user is nil' do
-      it 'sends an identify with the no account user' do
-        identification = AmplitudeAPI::Identification.new(
-          user_id: nil,
-          user_properties: {
-            first_name: 'John',
-            last_name: 'Doe'
-          }
-        )
-        expect(described_class).to receive(:identify).with(identification)
-
-        described_class.send_identify(nil, first_name: 'John', last_name: 'Doe')
-      end
-    end
-
-    context 'the user is a user_id' do
+    context 'with no device_id' do
       it 'sends an identify to AmplitudeAPI' do
         identification = AmplitudeAPI::Identification.new(
-          user_id: 123,
+          user_id: user,
           user_properties: {
             first_name: 'John',
             last_name: 'Doe'
@@ -219,7 +319,52 @@ describe AmplitudeAPI do
         )
         expect(described_class).to receive(:identify).with(identification)
 
-        described_class.send_identify(user.id, first_name: 'John', last_name: 'Doe')
+        described_class.send_identify(user, nil, first_name: 'John', last_name: 'Doe')
+      end
+
+      context 'the user is nil' do
+        it 'sends an identify with the no account user' do
+          identification = AmplitudeAPI::Identification.new(
+            user_id: nil,
+            user_properties: {
+              first_name: 'John',
+              last_name: 'Doe'
+            }
+          )
+          expect(described_class).to receive(:identify).with(identification)
+
+          described_class.send_identify(nil, nil, first_name: 'John', last_name: 'Doe')
+        end
+      end
+
+      context 'the user is a user_id' do
+        it 'sends an identify to AmplitudeAPI' do
+          identification = AmplitudeAPI::Identification.new(
+            user_id: 123,
+            user_properties: {
+              first_name: 'John',
+              last_name: 'Doe'
+            }
+          )
+          expect(described_class).to receive(:identify).with(identification)
+
+          described_class.send_identify(user.id, nil, first_name: 'John', last_name: 'Doe')
+        end
+      end
+    end
+    context 'with a device_id' do
+      it 'sends an identify to AmplitudeAPI' do
+        identification = AmplitudeAPI::Identification.new(
+          user_id: user,
+          device_id: 'abc',
+          user_properties: {
+            first_name: 'John',
+            last_name: 'Doe'
+          }
+        )
+        expect(described_class).to receive(:identify).with(identification)
+
+        described_class.send_identify(user, 'abc', first_name: 'John', last_name: 'Doe')
       end
     end
   end

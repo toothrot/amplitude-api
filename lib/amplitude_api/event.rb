@@ -4,6 +4,9 @@ class AmplitudeAPI
     # @!attribute [ rw ] user_id
     #   @return [ String ] the user_id to be sent to Amplitude
     attr_accessor :user_id
+    # @!attribute [ rw ] device_id
+    #   @return [ String ] the device_id to be sent to Amplitude
+    attr_accessor :device_id
     # @!attribute [ rw ] event_type
     #   @return [ String ] the event_type to be sent to Amplitude
     attr_accessor :event_type
@@ -43,6 +46,7 @@ class AmplitudeAPI
     # Create a new Event
     #
     # @param [ String ] user_id a user_id to associate with the event
+    # @param [ String ] device_id a device_id to associate with the event
     # @param [ String ] event_type a name for the event
     # @param [ Hash ] event_properties various properties to attach to the event
     # @param [ Time ] Time that the event occurred (defaults to now)
@@ -54,6 +58,7 @@ class AmplitudeAPI
     # @param [ String ] insert_id a unique identifier for the event
     def initialize(attributes = {})
       self.user_id = getopt(attributes, :user_id, '')
+      self.device_id = getopt(attributes, :device_id, nil)
       self.event_type = getopt(attributes, :event_type, '')
       self.event_properties = getopt(attributes, :event_properties, {})
       self.user_properties = getopt(attributes, :user_properties, {})
@@ -79,6 +84,7 @@ class AmplitudeAPI
       serialized_event = {}
       serialized_event[:event_type] = event_type
       serialized_event[:user_id] = user_id
+      serialized_event[:device_id] = device_id if device_id
       serialized_event[:event_properties] = event_properties
       serialized_event[:user_properties] = user_properties
       serialized_event[:time] = formatted_time if time

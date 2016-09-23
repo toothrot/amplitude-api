@@ -3,6 +3,7 @@ require 'spec_helper'
 describe AmplitudeAPI::Identification do
   user = Struct.new(:id)
 
+
   context 'with a user object' do
     describe '#body' do
       it "populates with the user's id" do
@@ -34,6 +35,11 @@ describe AmplitudeAPI::Identification do
     it 'includes the user id' do
       identification = described_class.new(user_id: 123)
       expect(identification.to_hash[:user_id]).to eq(123)
+    end
+
+    it 'includes the device id' do
+      identification = described_class.new(user_id: 123, device_id: 'abc')
+      expect(identification.to_hash[:device_id]).to eq('abc')
     end
 
     it 'includes arbitrary user properties' do
