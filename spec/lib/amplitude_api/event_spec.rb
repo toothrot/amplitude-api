@@ -45,6 +45,7 @@ describe AmplitudeAPI::Event do
         time = Time.parse('2016-01-01 00:00:00 -0000')
         event = described_class.new(
           'user_id' => 123,
+          'device_id' => 'abcd',
           'event_type' => 'sausage',
           'event_properties' => { 'a' => 'b' },
           'user_properties' => { 'c' => 'd' },
@@ -55,6 +56,7 @@ describe AmplitudeAPI::Event do
 
         expect(event.to_hash).to eq(event_type: 'sausage',
                                     user_id: 123,
+                                    device_id: 'abcd',
                                     event_properties: { 'a' => 'b' },
                                     user_properties: { 'c' => 'd' },
                                     time: 1_451_606_400_000,
@@ -66,6 +68,7 @@ describe AmplitudeAPI::Event do
         time = Time.parse('2016-01-01 00:00:00 -0000')
         event = described_class.new(
           user_id: 123,
+          device_id: 'abcd',
           event_type: 'sausage',
           event_properties: { 'a' => 'b' },
           user_properties: { 'c' => 'd' },
@@ -76,6 +79,7 @@ describe AmplitudeAPI::Event do
 
         expect(event.to_hash).to eq(event_type: 'sausage',
                                     user_id: 123,
+                                    device_id: 'abcd',
                                     event_properties: { 'a' => 'b' },
                                     user_properties: { 'c' => 'd' },
                                     time: 1_451_606_400_000,

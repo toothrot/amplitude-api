@@ -36,6 +36,11 @@ describe AmplitudeAPI::Identification do
       expect(identification.to_hash[:user_id]).to eq(123)
     end
 
+    it 'includes the device id' do
+      identification = described_class.new(user_id: 123, device_id: 'abc')
+      expect(identification.to_hash[:device_id]).to eq('abc')
+    end
+
     it 'includes arbitrary user properties' do
       identification = described_class.new(
         user_id: 123,

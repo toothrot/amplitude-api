@@ -22,15 +22,17 @@ class AmplitudeAPI
     #
     # @param [ String ] event_name a string that describes the event, e.g. "clicked on Home"
     # @param [ String ] user a string or integer that uniquely identifies a user.
+    # @param [ String ] device a string that uniquely identifies the device.
     # @param [ Hash ] event_properties a hash that is serialized to JSON,
     # and can contain any other property to be stored on the Event
     # @param [ Hash ] user_properties a hash that is serialized to JSON,
     # and contains user properties to be associated with the user
     #
     # @return [ Typhoeus::Response ]
-    def send_event(event_name, user, options = {})
+    def send_event(event_name, user, device, options = {})
       event = AmplitudeAPI::Event.new(
         user_id: user,
+        device_id: device,
         event_type: event_name,
         event_properties: options.fetch(:event_properties, {}),
         user_properties: options.fetch(:user_properties, {})
@@ -72,8 +74,12 @@ class AmplitudeAPI
 
     # ==== Identification related methods
 
-    def send_identify(user_id, user_properties = {})
-      identification = AmplitudeAPI::Identification.new(user_id: user_id, user_properties: user_properties)
+    def send_identify(user_id, device_id, user_properties = {})
+      identification = AmplitudeAPI::Identification.new(
+        user_id: user_id,
+        device_id: device_id,
+        user_properties: user_properties
+      )
       identify(identification)
     end
 

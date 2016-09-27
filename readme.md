@@ -35,7 +35,6 @@ Currently, we are using this in Rails and using ActiveJob to dispatch events asy
 ## What's Next
 
 * Thread support for background dispatching in bulk
-* `device_id` support as an alternative to `user_id`
 * Configurable default account to use when no `user_id` present
 
 ## Other useful resources
