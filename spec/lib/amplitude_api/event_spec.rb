@@ -51,7 +51,8 @@ describe AmplitudeAPI::Event do
           'user_properties' => { 'c' => 'd' },
           'time' => time,
           'ip' => '127.0.0.1',
-          'insert_id' => 'bestId'
+          'insert_id' => 'bestId',
+          'session_id' => 'sessionId'
         )
 
         expect(event.to_hash).to eq(event_type: 'sausage',
@@ -61,7 +62,8 @@ describe AmplitudeAPI::Event do
                                     user_properties: { 'c' => 'd' },
                                     time: 1_451_606_400_000,
                                     ip: '127.0.0.1',
-                                    insert_id: 'bestId')
+                                    insert_id: 'bestId',
+                                    session_id: 'sessionId')
       end
 
       it 'accepts symbol attributes' do
@@ -74,7 +76,8 @@ describe AmplitudeAPI::Event do
           user_properties: { 'c' => 'd' },
           time: time,
           ip: '127.0.0.1',
-          insert_id: 'bestId'
+          insert_id: 'bestId',
+          session_id: 'sessionId'
         )
 
         expect(event.to_hash).to eq(event_type: 'sausage',
@@ -84,7 +87,8 @@ describe AmplitudeAPI::Event do
                                     user_properties: { 'c' => 'd' },
                                     time: 1_451_606_400_000,
                                     ip: '127.0.0.1',
-                                    insert_id: 'bestId')
+                                    insert_id: 'bestId',
+                                    session_id: 'sessionId')
       end
     end
 

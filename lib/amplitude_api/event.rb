@@ -27,6 +27,10 @@ class AmplitudeAPI
     #   @return [ String ] the unique identifier to be sent to Amplitude
     attr_accessor :insert_id
 
+    # @!attribute [ rw ] session_id
+    #   @return [ String ] the session_id to be sent to Amplitude
+    attr_accessor :session_id
+
     # @!attribute [ rw ] price
     #   @return [ String ] (required for revenue data) price of the item purchased
     attr_accessor :price
@@ -65,6 +69,7 @@ class AmplitudeAPI
       self.time = getopt(attributes, :time)
       self.ip = getopt(attributes, :ip, '')
       self.insert_id = getopt(attributes, :insert_id)
+      self.session_id = getopt(attributes, :session_id, nil)
       validate_revenue_arguments(attributes)
     end
 
@@ -96,6 +101,7 @@ class AmplitudeAPI
       serialized_event[:time] = formatted_time if time
       serialized_event[:ip] = ip if ip
       serialized_event[:insert_id] = insert_id if insert_id
+      serialized_event[:session_id] = session_id if session_id
       serialized_event
     end
 
