@@ -6,8 +6,9 @@ require_relative 'amplitude_api/identification'
 
 # AmplitudeAPI
 class AmplitudeAPI
-  TRACK_URI_STRING = 'https://api.amplitude.com/httpapi'.freeze
-  IDENTIFY_URI_STRING = 'https://api.amplitude.com/identify'.freeze
+  TRACK_URI_STRING        = 'https://api.amplitude.com/httpapi'.freeze
+  IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'.freeze
+  SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'.freeze
 
   USER_WITH_NO_ACCOUNT = "user who doesn't have an account".freeze
 
@@ -15,6 +16,10 @@ class AmplitudeAPI
     # @!attribute [ rw ] api_key
     #   @return [ String ] an Amplitude API Key
     attr_accessor :api_key
+
+    # @!attribute [ rw ] secret_key
+    #   @return [ String ] an Amplitude Secret Key
+    attr_accessor :secret_key
 
     # ==== Event Tracking related methods
 
@@ -113,6 +118,40 @@ class AmplitudeAPI
     # Send one or more Identifications to the Amplitude Identify API
     def identify(*identifications)
       Typhoeus.post(IDENTIFY_URI_STRING, body: identify_body(identifications))
+    end
+
+    # ==== Event Segmentation related methods
+
+    # Get metrics for an event with segmentation.
+    #
+    # @param [ Hash ] e a hash that defines event.
+    # @param [ Time ] start_time a start time.
+    # @param [ Time ] end_time a end time.
+    # @param [ String ] m a string that defines aggregate function.
+    # For non-property metrics: "uniques", "totals", "pct_dau", or "average" (default: "uniques").
+    # For property metrics: "histogram", "sums", or "value_avg"
+    # (note: a valid "group_by" value is required in parameter e).
+    # @param [ Integer ] i an integer that defines segmentation interval.
+    # Set to -300000, -3600000, 1, 7, or 30 for realtime, hourly, daily, weekly,
+    # and monthly counts, respectively (default: 1). Realtime segmentation is capped at 2 days,
+    # hourly segmentation is capped at 7 days, and daily at 365 days.
+    # @param [ Array ] s an array that defines segment definitions.
+    # @param [ String ] g a string that defines property to group by.
+    # @param [ Integer ] limit an integer that defines number of Group By values
+    # returned (default: 100). The maximum limit is 1000.
+    #
+    # @return [ Typhoeus::Response ]
+    def segmentation(e, start_time, end_time, **options)
+      Typhoeus.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
+        e:     e.to_json,
+        m:     options[:m],
+        start: start_time.strftime('%Y%m%d'),
+        end:   end_time.strftime('%Y%m%d'),
+        i:     options[:i],
+        s:     (options[:s] || []).map(&:to_json),
+        g:     options[:g],
+        limit: options[:limit]
+      }.delete_if { |_, value| value.nil? }
     end
   end
 end

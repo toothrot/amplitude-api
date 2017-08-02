@@ -369,6 +369,26 @@ describe AmplitudeAPI do
     end
   end
 
+  describe '.segmentation' do
+    let(:end_time)   { Time.now }
+    let(:start_time) { end_time - 60 * 60 * 24 } # -1 day
+
+    it 'sends request to Amplitude' do
+      expect(Typhoeus).to receive(:get).with(AmplitudeAPI::SEGMENTATION_URI_STRING,
+                                             userpwd: "#{described_class.api_key}:#{described_class.secret_key}",
+                                             params: {
+                                               e:      { event_type: 'my event' }.to_json,
+                                               start:  start_time.strftime('%Y%m%d'),
+                                               end:    end_time.strftime('%Y%m%d'),
+                                               s:      [{ prop: 'foo', op: 'is', values: %w(bar) }.to_json]
+                                             })
+
+      described_class.segmentation({ event_type: 'my event' }, start_time, end_time,
+                                   s: [{ prop: 'foo', op: 'is', values: %w(bar) }]
+                                  )
+    end
+  end
+
   describe '#body' do
     it 'adds an api key' do
       event = AmplitudeAPI::Event.new(
