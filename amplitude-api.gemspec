@@ -21,6 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 2.99', '>= 2.99.0'
   spec.add_development_dependency 'rake', '~> 10.0', '>= 10.0'
   spec.add_development_dependency 'pry', '~> 0.9.12.6'
-  spec.add_dependency 'typhoeus', '~> 1.0.2'
+  spec.add_dependency 'typhoeus', '~> 1.1.2'
   spec.required_ruby_version = '~> 2.0'
 end
