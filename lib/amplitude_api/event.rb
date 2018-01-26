@@ -22,6 +22,12 @@ class AmplitudeAPI
     # @!attribute [ rw ] ip
     #   @return [ String ] IP address of the user
     attr_accessor :ip
+    # @!attribute [ rw ] platform
+    #   @return [ String ] the platform of the device.
+    attr_accessor :platform
+    # @!attribute [ rw ] country
+    #   @return [ String ] the country the user is in.
+    attr_accessor :country
 
     # @!attribute [ rw ] insert_id
     #   @return [ String ] the unique identifier to be sent to Amplitude
@@ -55,6 +61,8 @@ class AmplitudeAPI
     # @param [ String ] product_id (optional) an identifier for the product.
     # @param [ String ] revenue_type (optional) type of revenue
     # @param [ String ] IP address of the user
+    # @param [ String ] platform the platform of the device (e.g. iOS, Android, Web)
+    # @param [ String ] country the country the user is in
     # @param [ String ] insert_id a unique identifier for the event
     def initialize(attributes = {})
       self.user_id = getopt(attributes, :user_id, '')
@@ -64,6 +72,8 @@ class AmplitudeAPI
       self.user_properties = getopt(attributes, :user_properties, {})
       self.time = getopt(attributes, :time)
       self.ip = getopt(attributes, :ip, '')
+      self.platform = getopt(attributes, :platform, nil)
+      self.country = getopt(attributes, :country, nil)
       self.insert_id = getopt(attributes, :insert_id)
       validate_revenue_arguments(attributes)
     end
@@ -95,6 +105,8 @@ class AmplitudeAPI
       serialized_event[:device_id] = device_id if device_id
       serialized_event[:time] = formatted_time if time
       serialized_event[:ip] = ip if ip
+      serialized_event[:platform] = platform if platform
+      serialized_event[:country] = country if country
       serialized_event[:insert_id] = insert_id if insert_id
       serialized_event
     end

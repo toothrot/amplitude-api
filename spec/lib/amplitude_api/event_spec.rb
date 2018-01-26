@@ -51,6 +51,8 @@ describe AmplitudeAPI::Event do
           'user_properties' => { 'c' => 'd' },
           'time' => time,
           'ip' => '127.0.0.1',
+          'platform' => 'Web',
+          'country' => 'United States',
           'insert_id' => 'bestId'
         )
 
@@ -76,6 +78,8 @@ describe AmplitudeAPI::Event do
           user_properties: { 'c' => 'd' },
           time: time,
           ip: '127.0.0.1',
+          platform: 'Web',
+          country: 'United States',
           insert_id: 'bestId'
         )
 
@@ -86,6 +90,8 @@ describe AmplitudeAPI::Event do
                                     user_properties: { 'c' => 'd' },
                                     time: 1_451_606_400_000,
                                     ip: '127.0.0.1',
+                                    platform: 'Web',
+                                    country: 'United States',
                                     insert_id: 'bestId')
       end
     end
@@ -167,6 +173,44 @@ describe AmplitudeAPI::Event do
           event_type: 'clicked on home'
         )
         expect(event.to_hash).not_to have_key(:insert_id)
+      end
+    end
+
+    describe 'platform' do
+      it 'includes the platform for the event' do
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'clicked on home',
+          platform: 'Web'
+        )
+        expect(event.to_hash[:platform]).to eq('Web')
+      end
+
+      it 'does not include the platform if it is not set' do
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'clicked on home'
+        )
+        expect(event.to_hash).not_to have_key(:platform)
+      end
+    end
+
+    describe 'country' do
+      it 'includes the country for the event' do
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'clicked on home',
+          country: 'United States'
+        )
+        expect(event.to_hash[:country]).to eq('United States')
+      end
+
+      it 'does not include the country if it is not set' do
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'clicked on home'
+        )
+        expect(event.to_hash).not_to have_key(:country)
       end
     end
 
