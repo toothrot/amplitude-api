@@ -42,7 +42,7 @@ describe AmplitudeAPI::Event do
   describe 'init' do
     context 'attributes' do
       it 'accepts string attributes' do
-        time = Time.parse('2016-01-01 00:00:00 -0000')
+        time = Time.at(1_451_606_400_000 / 1_000)
         event = described_class.new(
           'user_id' => 123,
           'device_id' => 'abcd',
@@ -61,11 +61,13 @@ describe AmplitudeAPI::Event do
                                     user_properties: { 'c' => 'd' },
                                     time: 1_451_606_400_000,
                                     ip: '127.0.0.1',
+                                    platform: 'Web',
+                                    country: 'United States',
                                     insert_id: 'bestId')
       end
 
       it 'accepts symbol attributes' do
-        time = Time.parse('2016-01-01 00:00:00 -0000')
+        time = Time.at(1_451_606_400_000 / 1_000)
         event = described_class.new(
           user_id: 123,
           device_id: 'abcd',
@@ -131,7 +133,7 @@ describe AmplitudeAPI::Event do
 
     describe 'time' do
       it 'includes a time for the event' do
-        time = Time.parse('2016-01-01 00:00:00 -0000')
+        time = Time.at(1_451_606_400_000 / 1_000)
         event = described_class.new(
           user_id: 123,
           event_type: 'clicked on home',
