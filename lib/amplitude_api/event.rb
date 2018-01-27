@@ -1,81 +1,19 @@
 class AmplitudeAPI
   # AmplitudeAPI::Event
   class Event
-    # @!attribute [ rw ] user_id
-    #   @return [ String ] the user_id to be sent to Amplitude
-    attr_accessor :user_id
-    # @!attribute [ rw ] device_id
-    #   @return [ String ] the device_id to be sent to Amplitude
-    attr_accessor :device_id
-    # @!attribute [ rw ] event_type
-    #   @return [ String ] the event_type to be sent to Amplitude
-    attr_accessor :event_type
-    # @!attribute [ rw ] event_properties
-    #   @return [ String ] the event_properties to be attached to the Amplitude Event
-    attr_accessor :event_properties
-    # @!attribute [ rw ] user_properties
-    #   @return [ String ] the user_properties to be passed for the user
-    attr_accessor :user_properties
-    # @!attribute [ rw ] time
-    #   @return [ Time ] Time that the event occurred (defaults to now)
-    attr_accessor :time
-    # @!attribute [ rw ] ip
-    #   @return [ String ] IP address of the user
-    attr_accessor :ip
-    # @!attribute [ rw ] platform
-    #   @return [ String ] the platform of the device.
-    attr_accessor :platform
-    # @!attribute [ rw ] country
-    #   @return [ String ] the country the user is in.
-    attr_accessor :country
-
-    # @!attribute [ rw ] insert_id
-    #   @return [ String ] the unique identifier to be sent to Amplitude
-    attr_accessor :insert_id
-
-    # @!attribute [ rw ] price
-    #   @return [ String ] (required for revenue data) price of the item purchased
-    attr_accessor :price
-
-    # @!attribute [ rw ] quantity
-    #   @return [ String ] (required for revenue data, defaults to 1 if not specified) quantity of the item purchased
-    attr_accessor :quantity
-
-    # @!attribute [ rw ] product_id
-    #   @return [ String ] an identifier for the product. (Note: you must send a price and quantity with this field)
-    attr_accessor :product_id
-
-    # @!attribute [ rw ] revenue_type
-    #   @return [ String ] type of revenue. (Note: you must send a price and quantity with this field)
-    attr_accessor :revenue_type
+    AmplitudeAPI::Config.instance.whitelist.each do |attribute|
+      instance_eval("attr_accessor :#{attribute}")
+    end
 
     # Create a new Event
     #
-    # @param [ String ] user_id a user_id to associate with the event
-    # @param [ String ] device_id a device_id to associate with the event
-    # @param [ String ] event_type a name for the event
-    # @param [ Hash ] event_properties various properties to attach to the event
-    # @param [ Time ] Time that the event occurred (defaults to now)
-    # @param [ Double ] price (optional, but required for revenue data) price of the item purchased
-    # @param [ Integer ] quantity (optional, but required for revenue data) quantity of the item purchased
-    # @param [ String ] product_id (optional) an identifier for the product.
-    # @param [ String ] revenue_type (optional) type of revenue
-    # @param [ String ] IP address of the user
-    # @param [ String ] platform the platform of the device (e.g. iOS, Android, Web)
-    # @param [ String ] country the country the user is in
-    # @param [ String ] insert_id a unique identifier for the event
+    # See (Amplitude HTTP API Documentation)[https://amplitude.zendesk.com/hc/en-us/articles/204771828-HTTP-API]
+    # for a list of valid parameters and their types.
     def initialize(attributes = {})
-      self.user_id = getopt(attributes, :user_id, '')
-      self.device_id = getopt(attributes, :device_id, nil)
-      self.event_type = getopt(attributes, :event_type, '')
-      self.event_properties = getopt(attributes, :event_properties, {})
-      self.user_properties = getopt(attributes, :user_properties, {})
-      self.time = getopt(attributes, :time)
-      self.ip = getopt(attributes, :ip, '')
-      self.platform = getopt(attributes, :platform, nil)
-      self.country = getopt(attributes, :country, nil)
-      self.insert_id = getopt(attributes, :insert_id)
-      validate_revenue_arguments(attributes)
+      attributes.each do |k, v|
+        send("#{k}=", v) if respond_to?("#{k}=")
+      end
+      validate_arguments
     end
 
     def user_id=(value)
@@ -91,49 +29,72 @@ class AmplitudeAPI
     #
     # Used for serialization and comparison
     def to_hash
-      serialized_event = {}
-      serialized_event[:event_type] = event_type
-      serialized_event[:user_id] = user_id
-      serialized_event[:event_properties] = event_properties
-      serialized_event[:user_properties] = user_properties
-      serialized_event = add_optional_properties(serialized_event)
-      serialized_event.merge(revenue_hash)
+      event = {
+        event_type: event_type,
+        event_properties: formatted_event_properties,
+        user_properties: formatted_user_properties
+      }
+      event[:user_id] = user_id if user_id
+      event[:device_id] = device_id if device_id
+      event.merge(optional_properties).merge(revenue_hash)
+    end
+    alias to_h to_hash
+
+    # @return [ Hash ] Optional properties
+    def optional_properties
+      %i(device_id time ip platform country insert_id).map do |prop|
+        val = prop == :time ? formatted_time : send(prop)
+        val ? [prop, val] : nil
+      end.compact.to_h
     end
 
-    # @return [ Hash ] A serialized Event with optional properties
-    def add_optional_properties(serialized_event)
-      serialized_event[:device_id] = device_id if device_id
-      serialized_event[:time] = formatted_time if time
-      serialized_event[:ip] = ip if ip
-      serialized_event[:platform] = platform if platform
-      serialized_event[:country] = country if country
-      serialized_event[:insert_id] = insert_id if insert_id
-      serialized_event
+    # @return [ true, false ]
+    #
+    # Returns true if the event type matches one reserved by Amplitude API.
+    def reserved_event?(type)
+      ['[Amplitude] Start Session',
+       '[Amplitude] End Session',
+       '[Amplitude] Revenue',
+       '[Amplitude] Revenue (Verified)',
+       '[Amplitude] Revenue (Unverified)',
+       '[Amplitude] Merged User'].include?(type)
     end
 
     # @return [ true, false ]
     #
     # Compares +to_hash+ for equality
     def ==(other)
-      if other.respond_to?(:to_hash)
-        to_hash == other.to_hash
-      else
-        false
-      end
+      return false unless other.respond_to?(:to_h)
+      to_h == other.to_h
     end
 
     private
 
     def formatted_time
-      time.to_i * 1_000
+      Config.instance.time_formatter.call(time)
     end
 
-    def validate_revenue_arguments(options)
-      self.price = getopt(options, :price)
-      self.quantity = getopt(options, :quantity, 1) if price
-      self.product_id = getopt(options, :product_id)
-      self.revenue_type = getopt(options, :revenue_type)
-      return if price
+    def formatted_event_properties
+      Config.instance.event_properties_formatter.call(event_properties)
+    end
+
+    def formatted_user_properties
+      Config.instance.user_properties_formatter.call(user_properties)
+    end
+
+    def validate_arguments
+      validate_required_arguments
+      validate_revenue_arguments
+    end
+
+    def validate_required_arguments
+      raise ArgumentError, 'You must provide user_id or device_id (or both)' unless user_id || device_id
+      raise ArgumentError, 'You must provide event_type' unless event_type
+      raise ArgumentError, 'Invalid event_type - cannot match a reserved event name' if reserved_event?(event_type)
+    end
+
+    def validate_revenue_arguments
+      return self.quantity ||= 1 if price
       raise ArgumentError, 'You must provide a price in order to use the product_id' if product_id
       raise ArgumentError, 'You must provide a price in order to use the revenue_type' if revenue_type
     end
