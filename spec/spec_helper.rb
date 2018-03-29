@@ -17,6 +17,6 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before(:suite) do
-    AmplitudeAPI.api_key = 'stub api key'
+    AmplitudeAPI.config.api_key = 'stub api key'
   end
 end

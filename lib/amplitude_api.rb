@@ -1,11 +1,13 @@
 require 'json'
 require 'bundler/setup'
 require 'typhoeus'
-require_relative 'amplitude_api/event'
-require_relative 'amplitude_api/identification'
 
 # AmplitudeAPI
 class AmplitudeAPI
+  require_relative 'amplitude_api/config'
+  require_relative 'amplitude_api/event'
+  require_relative 'amplitude_api/identification'
+
   TRACK_URI_STRING        = 'https://api.amplitude.com/httpapi'.freeze
   IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'.freeze
   SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'.freeze
@@ -13,13 +15,21 @@ class AmplitudeAPI
   USER_WITH_NO_ACCOUNT = "user who doesn't have an account".freeze
 
   class << self
-    # @!attribute [ rw ] api_key
-    #   @return [ String ] an Amplitude API Key
-    attr_accessor :api_key
+    def config
+      Config.instance
+    end
 
-    # @!attribute [ rw ] secret_key
-    #   @return [ String ] an Amplitude Secret Key
-    attr_accessor :secret_key
+    def configure
+      yield config
+    end
+
+    def api_key
+      config.api_key
+    end
+
+    def secret_key
+      config.secret_key
+    end
 
     # ==== Event Tracking related methods
 

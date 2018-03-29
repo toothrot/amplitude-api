@@ -169,53 +169,34 @@ describe AmplitudeAPI do
     end
   end
 
-  describe '.initializer ' do
-    it 'initializes event without parameter' do
-      event = AmplitudeAPI::Event.new
-      expect(event.to_hash).to eq(
-        event_type: '',
-        user_id: '',
-        event_properties: {},
+  describe '.initializer' do
+    let(:attributes) do
+      {
+        user_id: 123,
+        event_type: 'test_event',
+        event_properties: {
+          test_property: 1
+        },
         user_properties: {},
-        ip: ''
-      )
+        ip: '8.8.8.8'
+      }
+    end
+
+    it 'requires event type' do
+      attributes.delete(:event_type)
+      expect { AmplitudeAPI::Event.new(attributes) }.to raise_error(ArgumentError)
+    end
+
+    it 'requires user id or device id' do
+      expect(AmplitudeAPI::Event.new(attributes).to_h).to eq(attributes)
+      attributes.merge!(device_id: 'abc').delete(:user_id)
+      expect(AmplitudeAPI::Event.new(attributes).to_h).to eq(attributes)
+      attributes.delete(:device_id)
+      expect { AmplitudeAPI::Event.new(attributes) }.to raise_error(ArgumentError)
     end
 
     it 'initializes event with parameter' do
-      event = AmplitudeAPI::Event.new(
-        user_id: 123,
-        event_type: 'test_event',
-        event_properties: {
-          test_property: 1
-        },
-        ip: '8.8.8.8'
-      )
-      expect(event.to_hash).to eq(
-        event_type: 'test_event',
-        user_id: 123,
-        event_properties: { test_property: 1 },
-        user_properties: {},
-        ip: '8.8.8.8'
-      )
-    end
-    it 'initializes event with parameter including device_id' do
-      event = AmplitudeAPI::Event.new(
-        user_id: 123,
-        device_id: 'abc',
-        event_type: 'test_event',
-        event_properties: {
-          test_property: 1
-        },
-        ip: '8.8.8.8'
-      )
-      expect(event.to_hash).to eq(
-        event_type: 'test_event',
-        user_id: 123,
-        device_id: 'abc',
-        event_properties: { test_property: 1 },
-        user_properties: {},
-        ip: '8.8.8.8'
-      )
+      expect(AmplitudeAPI::Event.new(attributes)).to eq(attributes)
     end
   end
 
@@ -416,22 +397,20 @@ describe AmplitudeAPI do
       )
       body = described_class.track_body(event)
 
-      expected = JSON.generate(
-        [
-          {
-            event_type: 'test_event',
-            user_id: 23,
-            event_properties: {
-              foo: 'bar'
-            },
-            user_properties: {
-              abc: '123'
-            },
-            ip: '8.8.8.8'
-          }
-        ]
-      )
-      expect(body[:event]).to eq(expected)
+      expected = [
+        {
+          event_type: 'test_event',
+          user_id: 23,
+          event_properties: {
+            foo: 'bar'
+          },
+          user_properties: {
+            abc: '123'
+          },
+          ip: '8.8.8.8'
+        }
+      ]
+      expect(JSON.parse(body[:event], symbolize_names: true)).to eq(expected)
     end
   end
 end
