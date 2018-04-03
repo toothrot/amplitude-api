@@ -1,5 +1,4 @@
 require 'json'
-require 'bundler/setup'
 require 'typhoeus'
 
 # AmplitudeAPI
