@@ -10,6 +10,7 @@ class AmplitudeAPI
   TRACK_URI_STRING        = 'https://api.amplitude.com/httpapi'.freeze
   IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'.freeze
   SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'.freeze
+  DELETION_URI_STRING     = 'https://amplitude.com/api/2/deletions/users'.freeze
 
   USER_WITH_NO_ACCOUNT = "user who doesn't have an account".freeze
 
@@ -161,6 +162,29 @@ class AmplitudeAPI
         g:     options[:g],
         limit: options[:limit]
       }.delete_if { |_, value| value.nil? }
+    end
+
+    # ==== GDPR compliance methods
+
+    # Delete a user from amplitude when they request it to comply with GDPR
+    # You must pass in either an array of user_ids or an array of amplitude_ids
+    #
+    # @param [ user_ids ] (optional) the user_ids to delete
+    # based on your database
+    # @param [ amplitude_ids ] (optional) the amplitude_ids to delete
+    # based on the amplitude database
+    # @param [ requester ] the email address of the person who
+    # is requesting the deletion, optional but useful for reporting
+    #
+    # @return [ Typhoeus::Response ]
+    def delete(user_ids:nil, amplitude_ids:nil, requester:nil)
+      Typhoeus.post DELETION_URI_STRING,
+                    userpwd: "#{api_key}:#{config.secret_key}",
+                    body: {
+                      amplitude_ids: amplitude_ids,
+                      user_ids: user_ids,
+                      requester: requester
+                    }.delete_if { |_, value| value.nil? }
     end
   end
 end

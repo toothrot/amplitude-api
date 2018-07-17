@@ -18,5 +18,6 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     AmplitudeAPI.config.api_key = 'stub api key'
+    AmplitudeAPI.config.secret_key = 'stub secret key'
   end
 end
