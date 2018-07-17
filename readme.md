@@ -15,7 +15,8 @@ The following code snippet will immediately track an event to the Amplitude API.
 
 ```ruby
 # Configure your Amplitude API key
-AmplitudeAPI.api_key = "abcdef123456"
+AmplitudeAPI.config.api_key = "abcdef123456"
+
 
 event = AmplitudeAPI::Event.new({
   user_id: "123",
