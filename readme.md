@@ -31,6 +31,22 @@ event = AmplitudeAPI::Event.new({
 AmplitudeAPI.track(event)
 ```
 
+## GDPR Compliance
+
+The following code snippet will delete a user from amplitude
+
+```ruby
+# Configure your Amplitude API key
+AmplitudeAPI.config.api_key = "abcdef123456"
+
+# Configure your Amplitude Secret Key
+AmplitudeAPI.config.secret_key = "secretMcSecret"
+
+AmplitudeAPI.delete(user_ids: [233],
+  requester: "privacy@mycompany.com"
+)
+```
+
 Currently, we are using this in Rails and using ActiveJob to dispatch events asynchronously. I plan on moving background/asynchronous support into this gem.
 
 ## What's Next

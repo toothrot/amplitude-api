@@ -370,6 +370,78 @@ describe AmplitudeAPI do
     end
   end
 
+  describe '.delete' do
+    context 'with user_ids' do
+      it 'sends the deletion to Amplitude' do
+        user_ids =  [123, 456, 555]
+        body = {
+          user_ids: user_ids
+        }
+
+        expect(Typhoeus).to receive(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+          body: body)
+        described_class.delete(user_ids: user_ids)
+      end
+
+      context 'with amplitude_ids' do
+        it 'sends the deletion to Amplitude' do
+          user_ids =  [123, 456, 555]
+          amplitude_ids = [122, 456]
+          body = {
+            user_ids: user_ids,
+            amplitude_ids: amplitude_ids
+          }
+
+          expect(Typhoeus).to receive(:post).with(
+            AmplitudeAPI::DELETION_URI_STRING,
+            userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+            body: body)
+          described_class.delete(
+            amplitude_ids: amplitude_ids,
+            user_ids: user_ids
+          )
+        end
+      end
+    end
+
+    context 'with amplitude_ids' do
+      it 'sends the deletion to Amplitude' do
+        amplitude_ids = [122, 456]
+        body = {
+          amplitude_ids: amplitude_ids
+        }
+
+        expect(Typhoeus).to receive(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+          body: body)
+        described_class.delete(amplitude_ids: amplitude_ids)
+      end
+    end
+
+    context 'with requester' do
+      it 'sends the deletion to Amplitude' do
+        amplitude_ids = [122, 456]
+
+        body = {
+          amplitude_ids: amplitude_ids,
+          requester: 'privacy@gethopscotch.com'
+        }
+        userpwd = "#{described_class.api_key}:#{described_class.config.secret_key}"
+
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::DELETION_URI_STRING,
+                                                userpwd: userpwd,
+                                                body: body)
+        described_class.delete(
+          amplitude_ids: amplitude_ids,
+          requester: 'privacy@gethopscotch.com'
+        )
+      end
+    end
+  end
+
   describe '#body' do
     it 'adds an api key' do
       event = AmplitudeAPI::Event.new(
