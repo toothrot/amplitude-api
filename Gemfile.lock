@@ -52,7 +52,7 @@ DEPENDENCIES
   rspec (>= 2.99.0)
   rubocop (~> 0.37.2)
   rubocop-rspec
-  typhoeus (~> 1.0.2)
+  typhoeus (~> 1.0)
 
 BUNDLED WITH
    1.10.6
