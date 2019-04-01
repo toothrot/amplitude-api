@@ -38,9 +38,9 @@ class AmplitudeAPI
     # @param [ String ] event_name a string that describes the event, e.g. "clicked on Home"
     # @param [ String ] user a string or integer that uniquely identifies a user.
     # @param [ String ] device a string that uniquely identifies the device.
-    # @param [ Hash ] event_properties a hash that is serialized to JSON,
+    # @option options [ Hash ] event_properties a hash that is serialized to JSON,
     # and can contain any other property to be stored on the Event
-    # @param [ Hash ] user_properties a hash that is serialized to JSON,
+    # @option options [ Hash ] user_properties a hash that is serialized to JSON,
     # and contains user properties to be associated with the user
     #
     # @return [ Typhoeus::Response ]
@@ -134,20 +134,20 @@ class AmplitudeAPI
 
     # Get metrics for an event with segmentation.
     #
-    # @param [ Hash ] e a hash that defines event.
+    # @param [ Hash ] event a hash that defines event.
     # @param [ Time ] start_time a start time.
     # @param [ Time ] end_time a end time.
-    # @param [ String ] m a string that defines aggregate function.
+    # @option options [ String ] m a string that defines aggregate function.
     # For non-property metrics: "uniques", "totals", "pct_dau", or "average" (default: "uniques").
     # For property metrics: "histogram", "sums", or "value_avg"
     # (note: a valid "group_by" value is required in parameter e).
-    # @param [ Integer ] i an integer that defines segmentation interval.
+    # @option options [ Integer ] i an integer that defines segmentation interval.
     # Set to -300000, -3600000, 1, 7, or 30 for realtime, hourly, daily, weekly,
     # and monthly counts, respectively (default: 1). Realtime segmentation is capped at 2 days,
     # hourly segmentation is capped at 7 days, and daily at 365 days.
-    # @param [ Array ] s an array that defines segment definitions.
-    # @param [ String ] g a string that defines property to group by.
-    # @param [ Integer ] limit an integer that defines number of Group By values
+    # @option options [ Array ] s an array that defines segment definitions.
+    # @option options [ String ] g a string that defines property to group by.
+    # @option options [ Integer ] limit an integer that defines number of Group By values
     # returned (default: 100). The maximum limit is 1000.
     #
     # @return [ Typhoeus::Response ]
@@ -164,16 +164,15 @@ class AmplitudeAPI
       }.delete_if { |_, value| value.nil? }
     end
 
-    # ==== GDPR compliance methods
-
-    # Delete a user from amplitude when they request it to comply with GDPR
+    # Delete a user from amplitude
+    #
     # You must pass in either an array of user_ids or an array of amplitude_ids
     #
     # @param [ user_ids ] (optional) the user_ids to delete
     # based on your database
     # @param [ amplitude_ids ] (optional) the amplitude_ids to delete
     # based on the amplitude database
-    # @param [ requester ] the email address of the person who
+    # @param [ String ] requester the email address of the person who
     # is requesting the deletion, optional but useful for reporting
     #
     # @return [ Typhoeus::Response ]
