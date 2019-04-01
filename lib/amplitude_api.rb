@@ -168,22 +168,35 @@ class AmplitudeAPI
     #
     # You must pass in either an array of user_ids or an array of amplitude_ids
     #
-    # @param [ user_ids ] (optional) the user_ids to delete
+    # @param [ Array<String> ] (optional) the user_ids to delete
     # based on your database
-    # @param [ amplitude_ids ] (optional) the amplitude_ids to delete
+    # @param [ Array<Integer> ] (optional) the amplitude_ids to delete
     # based on the amplitude database
     # @param [ String ] requester the email address of the person who
     # is requesting the deletion, optional but useful for reporting
     #
     # @return [ Typhoeus::Response ]
     def delete(user_ids: nil, amplitude_ids: nil, requester: nil)
-      Typhoeus.post DELETION_URI_STRING,
-                    userpwd: "#{api_key}:#{config.secret_key}",
-                    body: {
-                      amplitude_ids: amplitude_ids,
-                      user_ids: user_ids,
-                      requester: requester
-                    }.delete_if { |_, value| value.nil? }
+      user_ids = Array(user_ids)
+      amplitude_ids = Array(amplitude_ids)
+      Typhoeus.post(
+        DELETION_URI_STRING,
+        userpwd: "#{api_key}:#{config.secret_key}",
+        body: delete_body(user_ids, amplitude_ids, requester),
+        headers: { 'Content-Type': 'application/json' }
+      )
+    end
+
+    private
+
+    def delete_body(user_ids, amplitude_ids, requester)
+      JSON.generate(
+        {
+          amplitude_ids: amplitude_ids,
+          user_ids: user_ids,
+          requester: requester
+        }.delete_if { |_, value| value.nil? || value.empty? }
+      )
     end
   end
 end
