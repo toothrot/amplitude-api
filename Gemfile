@@ -1,7 +1,7 @@
 # Generated from /Users/alex/development/amplitude-api/amplitude-api.gemspec
 source 'https://rubygems.org'
 
-gem 'typhoeus', '~> 1.0'
+gem 'typhoeus', '~> 1.1'
 
 group :development, :test do
   gem 'pry', '~> 0.9.12.6'
