@@ -22,6 +22,7 @@ describe AmplitudeAPI do
           described_class.track(event)
         end
       end
+
       context 'with only device_id' do
         it 'sends the event to Amplitude' do
           event = AmplitudeAPI::Event.new(
@@ -38,6 +39,7 @@ describe AmplitudeAPI do
           described_class.track(event)
         end
       end
+
       context 'with both user_id and device_id' do
         it 'sends the event to Amplitude' do
           event = AmplitudeAPI::Event.new(
@@ -100,6 +102,7 @@ describe AmplitudeAPI do
           described_class.identify(identification)
         end
       end
+
       context 'with only device_id' do
         it 'sends the identification to Amplitude' do
           identification = AmplitudeAPI::Identification.new(
@@ -119,6 +122,7 @@ describe AmplitudeAPI do
           described_class.identify(identification)
         end
       end
+
       context 'with both user_id and device_id' do
         it 'sends the identification to Amplitude' do
           identification = AmplitudeAPI::Identification.new(
@@ -257,6 +261,7 @@ describe AmplitudeAPI do
         end
       end
     end
+
     context 'with device_id' do
       context 'the user is not nil' do
         it 'sends an event to AmplitudeAPI' do
@@ -333,6 +338,7 @@ describe AmplitudeAPI do
         end
       end
     end
+
     context 'with a device_id' do
       it 'sends an identify to AmplitudeAPI' do
         identification = AmplitudeAPI::Identification.new(
@@ -358,15 +364,14 @@ describe AmplitudeAPI do
       expect(Typhoeus).to receive(:get).with(AmplitudeAPI::SEGMENTATION_URI_STRING,
                                              userpwd: "#{described_class.api_key}:#{described_class.secret_key}",
                                              params: {
-                                               e:      { event_type: 'my event' }.to_json,
-                                               start:  start_time.strftime('%Y%m%d'),
-                                               end:    end_time.strftime('%Y%m%d'),
-                                               s:      [{ prop: 'foo', op: 'is', values: %w(bar) }.to_json]
+                                               e: { event_type: 'my event' }.to_json,
+                                               start: start_time.strftime('%Y%m%d'),
+                                               end: end_time.strftime('%Y%m%d'),
+                                               s: [{ prop: 'foo', op: 'is', values: %w[bar] }.to_json]
                                              })
 
       described_class.segmentation({ event_type: 'my event' }, start_time, end_time,
-                                   s: [{ prop: 'foo', op: 'is', values: %w(bar) }]
-                                  )
+                                   s: [{ prop: 'foo', op: 'is', values: %w[bar] }])
     end
   end
 
@@ -381,7 +386,8 @@ describe AmplitudeAPI do
         expect(Typhoeus).to receive(:post).with(
           AmplitudeAPI::DELETION_URI_STRING,
           userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: body)
+          body: body
+        )
         described_class.delete(user_ids: user_ids)
       end
 
@@ -397,7 +403,8 @@ describe AmplitudeAPI do
           expect(Typhoeus).to receive(:post).with(
             AmplitudeAPI::DELETION_URI_STRING,
             userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-            body: body)
+            body: body
+          )
           described_class.delete(
             amplitude_ids: amplitude_ids,
             user_ids: user_ids
@@ -416,7 +423,8 @@ describe AmplitudeAPI do
         expect(Typhoeus).to receive(:post).with(
           AmplitudeAPI::DELETION_URI_STRING,
           userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: body)
+          body: body
+        )
         described_class.delete(amplitude_ids: amplitude_ids)
       end
     end

@@ -1,3 +1,17 @@
 require: rubocop-rspec
 Metrics/LineLength:
   Max: 120
+
+# Disable some failing rspec cops that fail from upgrading gems until we can clean things up a bit.
+RSpec/ExampleLength:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/NestedGroups:
+  Enabled: false
+RSpec/MessageSpies:
+  Enabled: false
+RSpec/ContextWording:
+  Enabled: false

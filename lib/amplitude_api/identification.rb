@@ -3,7 +3,7 @@ class AmplitudeAPI
   class Identification
     # @!attribute [ rw ] user_id
     #   @return [ String ] the user_id to be sent to Amplitude
-    attr_accessor :user_id
+    attr_reader :user_id
     # @!attribute [ rw ] device_id
     #   @return [ String ] the device_id to be sent to Amplitude
     attr_accessor :device_id

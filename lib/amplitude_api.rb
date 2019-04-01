@@ -151,15 +151,15 @@ class AmplitudeAPI
     # returned (default: 100). The maximum limit is 1000.
     #
     # @return [ Typhoeus::Response ]
-    def segmentation(e, start_time, end_time, **options)
+    def segmentation(event, start_time, end_time, **options)
       Typhoeus.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
-        e:     e.to_json,
-        m:     options[:m],
+        e: event.to_json,
+        m: options[:m],
         start: start_time.strftime('%Y%m%d'),
-        end:   end_time.strftime('%Y%m%d'),
-        i:     options[:i],
-        s:     (options[:s] || []).map(&:to_json),
-        g:     options[:g],
+        end: end_time.strftime('%Y%m%d'),
+        i: options[:i],
+        s: (options[:s] || []).map(&:to_json),
+        g: options[:g],
         limit: options[:limit]
       }.delete_if { |_, value| value.nil? }
     end
@@ -177,7 +177,7 @@ class AmplitudeAPI
     # is requesting the deletion, optional but useful for reporting
     #
     # @return [ Typhoeus::Response ]
-    def delete(user_ids:nil, amplitude_ids:nil, requester:nil)
+    def delete(user_ids: nil, amplitude_ids: nil, requester: nil)
       Typhoeus.post DELETION_URI_STRING,
                     userpwd: "#{api_key}:#{config.secret_key}",
                     body: {

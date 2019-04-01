@@ -2,7 +2,7 @@ class AmplitudeAPI
   # AmplitudeAPI::Event
   class Event
     AmplitudeAPI::Config.instance.whitelist.each do |attribute|
-      instance_eval("attr_accessor :#{attribute}")
+      instance_eval("attr_accessor :#{attribute}", __FILE__, __LINE__)
     end
 
     # Create a new Event
@@ -42,7 +42,7 @@ class AmplitudeAPI
 
     # @return [ Hash ] Optional properties
     def optional_properties
-      %i(device_id time ip platform country insert_id).map do |prop|
+      %i[device_id time ip platform country insert_id].map do |prop|
         val = prop == :time ? formatted_time : send(prop)
         val ? [prop, val] : nil
       end.compact.to_h
@@ -65,6 +65,7 @@ class AmplitudeAPI
     # Compares +to_hash+ for equality
     def ==(other)
       return false unless other.respond_to?(:to_h)
+
       to_h == other.to_h
     end
 
