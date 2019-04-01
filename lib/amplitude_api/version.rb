@@ -1,3 +1,3 @@
 class AmplitudeAPI
-  VERSION = '0.0.10'.freeze
+  VERSION = '0.1.0'.freeze
 end
