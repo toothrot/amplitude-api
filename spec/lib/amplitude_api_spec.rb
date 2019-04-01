@@ -376,6 +376,22 @@ describe AmplitudeAPI do
   end
 
   describe '.delete' do
+    context 'a single user_id' do
+      it 'correctly formats the response' do
+        body = {
+          user_ids: ['123']
+        }
+
+        expect(Typhoeus).to receive(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+          body: JSON.generate(body),
+          headers: { 'Content-Type': 'application/json' }
+        )
+        described_class.delete(user_ids: '123')
+      end
+    end
+
     context 'with user_ids' do
       it 'sends the deletion to Amplitude' do
         user_ids =  [123, 456, 555]
@@ -386,7 +402,8 @@ describe AmplitudeAPI do
         expect(Typhoeus).to receive(:post).with(
           AmplitudeAPI::DELETION_URI_STRING,
           userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: body
+          body: JSON.generate(body),
+          headers: { 'Content-Type': 'application/json' }
         )
         described_class.delete(user_ids: user_ids)
       end
@@ -396,14 +413,15 @@ describe AmplitudeAPI do
           user_ids =  [123, 456, 555]
           amplitude_ids = [122, 456]
           body = {
-            user_ids: user_ids,
-            amplitude_ids: amplitude_ids
+            amplitude_ids: amplitude_ids,
+            user_ids: user_ids
           }
 
           expect(Typhoeus).to receive(:post).with(
             AmplitudeAPI::DELETION_URI_STRING,
             userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-            body: body
+            body: JSON.generate(body),
+            headers: { 'Content-Type': 'application/json' }
           )
           described_class.delete(
             amplitude_ids: amplitude_ids,
@@ -423,9 +441,26 @@ describe AmplitudeAPI do
         expect(Typhoeus).to receive(:post).with(
           AmplitudeAPI::DELETION_URI_STRING,
           userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: body
+          body: JSON.generate(body),
+          headers: { 'Content-Type': 'application/json' }
         )
         described_class.delete(amplitude_ids: amplitude_ids)
+      end
+    end
+
+    context 'a single amplitude_id' do
+      it 'correctly formats the response' do
+        body = {
+          amplitude_ids: [122]
+        }
+
+        expect(Typhoeus).to receive(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+          body: JSON.generate(body),
+          headers: { 'Content-Type': 'application/json' }
+        )
+        described_class.delete(amplitude_ids: 122)
       end
     end
 
@@ -439,9 +474,12 @@ describe AmplitudeAPI do
         }
         userpwd = "#{described_class.api_key}:#{described_class.config.secret_key}"
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::DELETION_URI_STRING,
-                                                userpwd: userpwd,
-                                                body: body)
+        expect(Typhoeus).to receive(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          userpwd: userpwd,
+          body: JSON.generate(body),
+          headers: { 'Content-Type': 'application/json' }
+        )
         described_class.delete(
           amplitude_ids: amplitude_ids,
           requester: 'privacy@gethopscotch.com'
