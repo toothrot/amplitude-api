@@ -84,7 +84,9 @@ class AmplitudeAPI
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
-      Typhoeus.post(TRACK_URI_STRING, body: track_body(events))
+      Typhoeus.post(TRACK_URI_STRING, body: track_body(events),
+                                      timeout: config.timeout,
+                                      connecttimeout: config.connecttimeout)
     end
 
     # ==== Identification related methods
@@ -127,7 +129,9 @@ class AmplitudeAPI
     #
     # Send one or more Identifications to the Amplitude Identify API
     def identify(*identifications)
-      Typhoeus.post(IDENTIFY_URI_STRING, body: identify_body(identifications))
+      Typhoeus.post(IDENTIFY_URI_STRING, timeout: config.timeout,
+                                         connecttimeout: config.connecttimeout,
+                                         body: identify_body(identifications))
     end
 
     # ==== Event Segmentation related methods
@@ -152,16 +156,9 @@ class AmplitudeAPI
     #
     # @return [ Typhoeus::Response ]
     def segmentation(event, start_time, end_time, **options)
-      Typhoeus.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
-        e: event.to_json,
-        m: options[:m],
-        start: start_time.strftime('%Y%m%d'),
-        end: end_time.strftime('%Y%m%d'),
-        i: options[:i],
-        s: (options[:s] || []).map(&:to_json),
-        g: options[:g],
-        limit: options[:limit]
-      }.delete_if { |_, value| value.nil? }
+      Typhoeus.get SEGMENTATION_URI_STRING, timeout: config.timeout, connecttimeout: config.connecttimeout,
+                                            userpwd: "#{api_key}:#{secret_key}",
+                                            params: segmentation_params(event, start_time, end_time, options)
     end
 
     # Delete a user from amplitude
@@ -181,6 +178,8 @@ class AmplitudeAPI
       amplitude_ids = Array(amplitude_ids)
       Typhoeus.post(
         DELETION_URI_STRING,
+        timeout: config.timeout,
+        connecttimeout: config.connecttimeout,
         userpwd: "#{api_key}:#{config.secret_key}",
         body: delete_body(user_ids, amplitude_ids, requester),
         headers: { 'Content-Type': 'application/json' }
@@ -197,6 +196,19 @@ class AmplitudeAPI
           requester: requester
         }.delete_if { |_, value| value.nil? || value.empty? }
       )
+    end
+
+    def segmentation_params(event, start_time, end_time, **options)
+      {
+        e: event.to_json,
+        m: options[:m],
+        start: start_time.strftime('%Y%m%d'),
+        end: end_time.strftime('%Y%m%d'),
+        i: options[:i],
+        s: (options[:s] || []).map(&:to_json),
+        g: options[:g],
+        limit: options[:limit]
+      }.compact
     end
   end
 end

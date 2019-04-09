@@ -1,6 +1,6 @@
 # Amplitude API Changelog
 
-We would like to think our many [contributors](https://github.com/toothrot/amplitude-api/graphs/contributors) for
+We would like to thank our many [contributors](https://github.com/toothrot/amplitude-api/graphs/contributors) for
 suggestions, ideas and improvements to Amplitude API.
 
 ## 0.1.1 (2019-01-01)
