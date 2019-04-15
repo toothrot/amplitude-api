@@ -9,4 +9,5 @@ group :development, :test do
   gem 'rspec', '>= 2.99.0'
   gem 'rubocop', '~> 0.66.0', require: false
   gem 'rubocop-rspec'
+  gem 'webmock', '~> 3.5.1'
 end

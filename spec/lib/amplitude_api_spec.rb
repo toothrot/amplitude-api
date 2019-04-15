@@ -17,9 +17,11 @@ describe AmplitudeAPI do
             event: JSON.generate([event.to_hash])
           }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+          request_stub = stub_request(:post, AmplitudeAPI::TRACK_URI_STRING).with(body: body)
 
           described_class.track(event)
+
+          expect(request_stub).to have_been_requested.once
         end
       end
 
@@ -34,9 +36,11 @@ describe AmplitudeAPI do
             event: JSON.generate([event.to_hash])
           }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+          request_stub = stub_request(:post, AmplitudeAPI::TRACK_URI_STRING).with(body: body)
 
           described_class.track(event)
+
+          expect(request_stub).to have_been_requested.once
         end
       end
 
@@ -52,9 +56,11 @@ describe AmplitudeAPI do
             event: JSON.generate([event.to_hash])
           }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+          request_stub = stub_request(:post, AmplitudeAPI::TRACK_URI_STRING).with(body: body)
 
           described_class.track(event)
+
+          expect(request_stub).to have_been_requested.once
         end
       end
     end
@@ -74,9 +80,11 @@ describe AmplitudeAPI do
           event: JSON.generate([event.to_hash, event2.to_hash])
         }
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+        request_stub = stub_request(:post, AmplitudeAPI::TRACK_URI_STRING).with(body: body)
 
         described_class.track([event, event2])
+
+        expect(request_stub).to have_been_requested.once
       end
     end
   end
@@ -97,9 +105,11 @@ describe AmplitudeAPI do
             identification: JSON.generate([identification.to_hash])
           }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+          request_stub = stub_request(:post, AmplitudeAPI::IDENTIFY_URI_STRING).with(body: body)
 
           described_class.identify(identification)
+
+          expect(request_stub).to have_been_requested.once
         end
       end
 
@@ -117,9 +127,11 @@ describe AmplitudeAPI do
             identification: JSON.generate([identification.to_hash])
           }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+          request_stub = stub_request(:post, AmplitudeAPI::IDENTIFY_URI_STRING).with(body: body)
 
           described_class.identify(identification)
+
+          expect(request_stub).to have_been_requested.once
         end
       end
 
@@ -138,9 +150,11 @@ describe AmplitudeAPI do
             identification: JSON.generate([identification.to_hash])
           }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+          request_stub = stub_request(:post, AmplitudeAPI::IDENTIFY_URI_STRING).with(body: body)
 
           described_class.identify(identification)
+
+          expect(request_stub).to have_been_requested.once
         end
       end
     end
@@ -166,9 +180,11 @@ describe AmplitudeAPI do
           identification: JSON.generate([identification.to_hash, identification2.to_hash])
         }
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+        request_stub = stub_request(:post, AmplitudeAPI::IDENTIFY_URI_STRING).with(body: body)
 
         described_class.identify([identification, identification2])
+
+        expect(request_stub).to have_been_requested.once
       end
     end
   end
@@ -361,17 +377,20 @@ describe AmplitudeAPI do
     let(:start_time) { end_time - 60 * 60 * 24 } # -1 day
 
     it 'sends request to Amplitude' do
-      expect(Typhoeus).to receive(:get).with(AmplitudeAPI::SEGMENTATION_URI_STRING,
-                                             userpwd: "#{described_class.api_key}:#{described_class.secret_key}",
-                                             params: {
-                                               e: { event_type: 'my event' }.to_json,
-                                               start: start_time.strftime('%Y%m%d'),
-                                               end: end_time.strftime('%Y%m%d'),
-                                               s: [{ prop: 'foo', op: 'is', values: %w[bar] }.to_json]
-                                             })
+      request_stub = stub_request(:get, AmplitudeAPI::SEGMENTATION_URI_STRING).with(
+        basic_auth: [described_class.api_key, described_class.secret_key],
+        query: {
+          e: { event_type: 'my event' }.to_json,
+          start: start_time.strftime('%Y%m%d'),
+          end: end_time.strftime('%Y%m%d'),
+          s: [{ prop: 'foo', op: 'is', values: %w[bar] }.to_json]
+        }
+      )
 
       described_class.segmentation({ event_type: 'my event' }, start_time, end_time,
                                    s: [{ prop: 'foo', op: 'is', values: %w[bar] }])
+
+      expect(request_stub).to have_been_requested.once
     end
   end
 
@@ -382,13 +401,15 @@ describe AmplitudeAPI do
           user_ids: ['123']
         }
 
-        expect(Typhoeus).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+        request_stub = stub_request(:post, AmplitudeAPI::DELETION_URI_STRING).with(
+          basic_auth: [described_class.api_key, described_class.secret_key],
           body: JSON.generate(body),
           headers: { 'Content-Type': 'application/json' }
         )
+
         described_class.delete(user_ids: '123')
+
+        expect(request_stub).to have_been_requested.once
       end
     end
 
@@ -399,13 +420,15 @@ describe AmplitudeAPI do
           user_ids: user_ids
         }
 
-        expect(Typhoeus).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+        request_stub = stub_request(:post, AmplitudeAPI::DELETION_URI_STRING).with(
+          basic_auth: [described_class.api_key, described_class.secret_key],
           body: JSON.generate(body),
           headers: { 'Content-Type': 'application/json' }
         )
+
         described_class.delete(user_ids: user_ids)
+
+        expect(request_stub).to have_been_requested.once
       end
 
       context 'with amplitude_ids' do
@@ -417,16 +440,18 @@ describe AmplitudeAPI do
             user_ids: user_ids
           }
 
-          expect(Typhoeus).to receive(:post).with(
-            AmplitudeAPI::DELETION_URI_STRING,
-            userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+          request_stub = stub_request(:post, AmplitudeAPI::DELETION_URI_STRING).with(
+            basic_auth: [described_class.api_key, described_class.secret_key],
             body: JSON.generate(body),
             headers: { 'Content-Type': 'application/json' }
           )
+
           described_class.delete(
             amplitude_ids: amplitude_ids,
             user_ids: user_ids
           )
+
+          expect(request_stub).to have_been_requested.once
         end
       end
     end
@@ -438,13 +463,15 @@ describe AmplitudeAPI do
           amplitude_ids: amplitude_ids
         }
 
-        expect(Typhoeus).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+        request_stub = stub_request(:post, AmplitudeAPI::DELETION_URI_STRING).with(
+          basic_auth: [described_class.api_key, described_class.secret_key],
           body: JSON.generate(body),
           headers: { 'Content-Type': 'application/json' }
         )
+
         described_class.delete(amplitude_ids: amplitude_ids)
+
+        expect(request_stub).to have_been_requested.once
       end
     end
 
@@ -454,36 +481,38 @@ describe AmplitudeAPI do
           amplitude_ids: [122]
         }
 
-        expect(Typhoeus).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
+        request_stub = stub_request(:post, AmplitudeAPI::DELETION_URI_STRING).with(
+          basic_auth: [described_class.api_key, described_class.secret_key],
           body: JSON.generate(body),
           headers: { 'Content-Type': 'application/json' }
         )
+
         described_class.delete(amplitude_ids: 122)
+
+        expect(request_stub).to have_been_requested.once
       end
     end
 
     context 'with requester' do
       it 'sends the deletion to Amplitude' do
         amplitude_ids = [122, 456]
-
         body = {
           amplitude_ids: amplitude_ids,
           requester: 'privacy@gethopscotch.com'
         }
-        userpwd = "#{described_class.api_key}:#{described_class.config.secret_key}"
 
-        expect(Typhoeus).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: userpwd,
+        request_stub = stub_request(:post, AmplitudeAPI::DELETION_URI_STRING).with(
+          basic_auth: [described_class.api_key, described_class.secret_key],
           body: JSON.generate(body),
           headers: { 'Content-Type': 'application/json' }
         )
+
         described_class.delete(
           amplitude_ids: amplitude_ids,
           requester: 'privacy@gethopscotch.com'
         )
+
+        expect(request_stub).to have_been_requested.once
       end
     end
   end
