@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'typhoeus'
 
@@ -7,12 +9,12 @@ class AmplitudeAPI
   require_relative 'amplitude_api/event'
   require_relative 'amplitude_api/identification'
 
-  TRACK_URI_STRING        = 'https://api.amplitude.com/httpapi'.freeze
-  IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'.freeze
-  SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'.freeze
-  DELETION_URI_STRING     = 'https://amplitude.com/api/2/deletions/users'.freeze
+  TRACK_URI_STRING        = 'https://api.amplitude.com/httpapi'
+  IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'
+  SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'
+  DELETION_URI_STRING     = 'https://amplitude.com/api/2/deletions/users'
 
-  USER_WITH_NO_ACCOUNT = "user who doesn't have an account".freeze
+  USER_WITH_NO_ACCOUNT = "user who doesn't have an account"
 
   class << self
     def config

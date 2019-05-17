@@ -1,8 +1,15 @@
 require: rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.4
+
 Metrics/LineLength:
   Max: 120
 
 # Disable some failing rspec cops that fail from upgrading gems until we can clean things up a bit.
+Naming/FileName:
+  Exclude:
+    - lib/amplitude-api.rb
 RSpec/ExampleLength:
   Enabled: false
 Metrics/BlockLength:

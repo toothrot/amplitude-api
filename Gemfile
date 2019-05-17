@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Generated from /Users/alex/development/amplitude-api/amplitude-api.gemspec
 source 'https://rubygems.org'
 

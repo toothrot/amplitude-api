@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AmplitudeAPI
   # AmplitudeAPI::Event
   class Event
