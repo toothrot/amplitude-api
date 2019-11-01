@@ -9,7 +9,7 @@ class AmplitudeAPI
   require_relative 'amplitude_api/event'
   require_relative 'amplitude_api/identification'
 
-  TRACK_URI_STRING        = 'https://api.amplitude.com/httpapi'
+  TRACK_URI_STRING        = 'https://api.amplitude.com/2/httpapi'
   IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'
   SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'
   DELETION_URI_STRING     = 'https://amplitude.com/api/2/deletions/users'
@@ -72,7 +72,7 @@ class AmplitudeAPI
 
       {
         api_key: api_key,
-        event: JSON.generate(event_body)
+        events: JSON.generate(event_body)
       }
     end
 
@@ -86,7 +86,10 @@ class AmplitudeAPI
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
-      Typhoeus.post(TRACK_URI_STRING, body: track_body(events))
+      Typhoeus.post(
+        TRACK_URI_STRING,
+        headers: { 'Content-Type': 'application/json' },
+        body: track_body(events))
     end
 
     # ==== Identification related methods

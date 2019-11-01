@@ -16,10 +16,11 @@ describe AmplitudeAPI do
           )
           body = {
             api_key: described_class.api_key,
-            event: JSON.generate([event.to_hash])
+            events: JSON.generate([event.to_hash])
           }
+          headers = { 'Content-Type': 'application/json' }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
 
           described_class.track(event)
         end
@@ -33,10 +34,11 @@ describe AmplitudeAPI do
           )
           body = {
             api_key: described_class.api_key,
-            event: JSON.generate([event.to_hash])
+            events: JSON.generate([event.to_hash])
           }
+          headers = { 'Content-Type': 'application/json' }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
 
           described_class.track(event)
         end
@@ -51,10 +53,11 @@ describe AmplitudeAPI do
           )
           body = {
             api_key: described_class.api_key,
-            event: JSON.generate([event.to_hash])
+            events: JSON.generate([event.to_hash])
           }
+          headers = { 'Content-Type': 'application/json' }
 
-          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+          expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
 
           described_class.track(event)
         end
@@ -73,10 +76,11 @@ describe AmplitudeAPI do
         )
         body = {
           api_key: described_class.api_key,
-          event: JSON.generate([event.to_hash, event2.to_hash])
+          events: JSON.generate([event.to_hash, event2.to_hash])
         }
+        headers = { 'Content-Type': 'application/json' }
 
-        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body: body)
+        expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
 
         described_class.track([event, event2])
       end
@@ -530,7 +534,7 @@ describe AmplitudeAPI do
           ip: '8.8.8.8'
         }
       ]
-      expect(JSON.parse(body[:event], symbolize_names: true)).to eq(expected)
+      expect(JSON.parse(body[:events], symbolize_names: true)).to eq(expected)
     end
   end
 end
