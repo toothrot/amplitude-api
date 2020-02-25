@@ -55,7 +55,8 @@ describe AmplitudeAPI::Event do
           'ip' => '127.0.0.1',
           'platform' => 'Web',
           'country' => 'United States',
-          'insert_id' => 'bestId'
+          'insert_id' => 'bestId',
+          'session_id' => 'mySessionId',
         )
 
         expect(event.to_hash).to eq(event_type: 'sausage',
@@ -67,7 +68,8 @@ describe AmplitudeAPI::Event do
                                     ip: '127.0.0.1',
                                     platform: 'Web',
                                     country: 'United States',
-                                    insert_id: 'bestId')
+                                    insert_id: 'bestId',
+                                    session_id: 'mySessionId')
       end
 
       it 'accepts symbol attributes' do
@@ -82,7 +84,8 @@ describe AmplitudeAPI::Event do
           ip: '127.0.0.1',
           platform: 'Web',
           country: 'United States',
-          insert_id: 'bestId'
+          insert_id: 'bestId',
+          session_id: 'mySessionId'
         )
 
         expect(event.to_hash).to eq(event_type: 'sausage',
@@ -94,7 +97,8 @@ describe AmplitudeAPI::Event do
                                     ip: '127.0.0.1',
                                     platform: 'Web',
                                     country: 'United States',
-                                    insert_id: 'bestId')
+                                    insert_id: 'bestId',
+                                    session_id: 'mySessionId')
       end
     end
 
