@@ -17,7 +17,8 @@ describe AmplitudeAPI do
           )
           body = JSON.generate(
             api_key: described_class.api_key,
-            events: [event.to_hash]
+            events: [event.to_hash],
+            options: { min_id_length: 1 }
           )
 
           expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
@@ -34,7 +35,8 @@ describe AmplitudeAPI do
           )
           body = JSON.generate(
             api_key: described_class.api_key,
-            events: [event.to_hash]
+            events: [event.to_hash],
+            options: { min_id_length: 1 }
           )
 
           expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
@@ -52,7 +54,8 @@ describe AmplitudeAPI do
           )
           body = JSON.generate(
             api_key: described_class.api_key,
-            events: [event.to_hash]
+            events: [event.to_hash],
+            options: { min_id_length: 1 }
           )
 
           expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
@@ -74,7 +77,8 @@ describe AmplitudeAPI do
         )
         body = JSON.generate(
           api_key: described_class.api_key,
-          events: [event.to_hash, event2.to_hash]
+          events: [event.to_hash, event2.to_hash],
+          options: { min_id_length: 1 }
         )
 
         expect(Typhoeus).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)

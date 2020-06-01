@@ -72,7 +72,8 @@ class AmplitudeAPI
 
       JSON.generate(
         api_key: api_key,
-        events: event_body
+        events: event_body,
+        options: { min_id_length: 1 }
       )
     end
 
