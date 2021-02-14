@@ -3,7 +3,7 @@
 # Generated from /Users/alex/development/amplitude-api/amplitude-api.gemspec
 source 'https://rubygems.org'
 
-gem 'typhoeus', '~> 1.1'
+gem 'faraday', '~> 1.3'
 
 group :development, :test do
   gem 'pry', '~> 0.12.2'

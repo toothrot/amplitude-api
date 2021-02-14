@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'typhoeus'
+require 'faraday'
 
 # AmplitudeAPI
 class AmplitudeAPI
@@ -45,7 +45,7 @@ class AmplitudeAPI
     # @option options [ Hash ] user_properties a hash that is serialized to JSON,
     # and contains user properties to be associated with the user
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     def send_event(event_name, user, device, options = {})
       event = AmplitudeAPI::Event.new(
         user_id: user,
@@ -82,11 +82,11 @@ class AmplitudeAPI
     # @overload track([events])
     #   @param [ Array<AmplitudeAPI::Event> ] Send an array of events in a single request to Amplitude
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
-      Typhoeus.post(
+      Faraday.post(
         TRACK_URI_STRING,
         headers: { 'Content-Type' => 'application/json' },
         body: track_body(events))
@@ -128,11 +128,11 @@ class AmplitudeAPI
     # @overload identify([identifications])
     #   @param [ Array<AmplitudeAPI::Identify> ] Send an array of identifications in a single request to Amplitude
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     #
     # Send one or more Identifications to the Amplitude Identify API
     def identify(*identifications)
-      Typhoeus.post(IDENTIFY_URI_STRING, body: identify_body(identifications))
+      Faraday.post(IDENTIFY_URI_STRING, body: identify_body(identifications))
     end
 
     # ==== Event Segmentation related methods
@@ -155,9 +155,9 @@ class AmplitudeAPI
     # @option options [ Integer ] limit an integer that defines number of Group By values
     # returned (default: 100). The maximum limit is 1000.
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     def segmentation(event, start_time, end_time, **options)
-      Typhoeus.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
+      Faraday.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
         e: event.to_json,
         m: options[:m],
         start: start_time.strftime('%Y%m%d'),
@@ -180,11 +180,11 @@ class AmplitudeAPI
     # @param [ String ] requester the email address of the person who
     # is requesting the deletion, optional but useful for reporting
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     def delete(user_ids: nil, amplitude_ids: nil, requester: nil)
       user_ids = Array(user_ids)
       amplitude_ids = Array(amplitude_ids)
-      Typhoeus.post(
+      Faraday.post(
         DELETION_URI_STRING,
         userpwd: "#{api_key}:#{config.secret_key}",
         body: delete_body(user_ids, amplitude_ids, requester),
