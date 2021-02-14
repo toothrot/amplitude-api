@@ -19,7 +19,7 @@ AmplitudeAPI.config.api_key = "abcdef123456"
 
 
 event = AmplitudeAPI::Event.new({
-  user_id: "123",
+  user_id: "12345",
   event_type: "clicked on home",
   time: Time.now,
   insert_id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
@@ -42,12 +42,12 @@ AmplitudeAPI.config.api_key = "abcdef123456"
 # Configure your Amplitude Secret Key
 AmplitudeAPI.config.secret_key = "secretMcSecret"
 
-AmplitudeAPI.delete(user_ids: [233],
+AmplitudeAPI.delete(user_ids: ["12345"],
   requester: "privacy@example.com"
 )
 ```
 
-Currently, we are using this in Rails and using ActiveJob to dispatch events asynchronously. I plan on moving 
+Currently, we are using this in Rails and using ActiveJob to dispatch events asynchronously. I plan on moving
 background/asynchronous support into this gem.
 
 ## What's Next
@@ -56,7 +56,7 @@ background/asynchronous support into this gem.
 * Configurable default account to use when no `user_id` present
 
 ## Other useful resources
-* [Amplitude HTTP Api Documentation](https://amplitude.zendesk.com/hc/en-us/articles/204771828)
+* [Amplitude HTTP API V2 Api Documentation](https://developers.amplitude.com/docs/http-api-v2)
 * [Segment.io Amplitude integration](https://segment.com/docs/integrations/amplitude/)
 
 ## Contributing
