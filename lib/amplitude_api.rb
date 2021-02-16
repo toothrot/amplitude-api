@@ -86,10 +86,7 @@ class AmplitudeAPI
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
-      Faraday.post(
-        TRACK_URI_STRING,
-        headers: { 'Content-Type' => 'application/json' },
-        body: track_body(events))
+      Faraday.post(TRACK_URI_STRING, track_body(events), { 'Content-Type' => 'application/json' })
     end
 
     # ==== Identification related methods
@@ -132,7 +129,7 @@ class AmplitudeAPI
     #
     # Send one or more Identifications to the Amplitude Identify API
     def identify(*identifications)
-      Faraday.post(IDENTIFY_URI_STRING, body: identify_body(identifications))
+      Faraday.post(IDENTIFY_URI_STRING, identify_body(identifications))
     end
 
     # ==== Event Segmentation related methods
@@ -184,12 +181,10 @@ class AmplitudeAPI
     def delete(user_ids: nil, amplitude_ids: nil, requester: nil)
       user_ids = Array(user_ids)
       amplitude_ids = Array(amplitude_ids)
-      Faraday.post(
-        DELETION_URI_STRING,
-        userpwd: "#{api_key}:#{config.secret_key}",
-        body: delete_body(user_ids, amplitude_ids, requester),
-        headers: { 'Content-Type' => 'application/json' }
-      )
+
+      Faraday.new(DELETION_URI_STRING) do |conn|
+        conn.basic_auth config.api_key, config.secret_key
+      end.post
     end
 
     private
