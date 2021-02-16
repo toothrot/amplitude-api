@@ -20,7 +20,7 @@ describe AmplitudeAPI do
           })
           headers = { 'Content-Type' => 'application/json' }
 
-          expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
+          expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body, headers)
 
           described_class.track(event)
         end
@@ -38,7 +38,7 @@ describe AmplitudeAPI do
           })
           headers = { 'Content-Type' => 'application/json' }
 
-          expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
+          expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body, headers)
 
           described_class.track(event)
         end
@@ -57,7 +57,7 @@ describe AmplitudeAPI do
           })
           headers = { 'Content-Type' => 'application/json' }
 
-          expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
+          expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body, headers)
 
           described_class.track(event)
         end
@@ -80,7 +80,7 @@ describe AmplitudeAPI do
         })
         headers = { 'Content-Type' => 'application/json' }
 
-        expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, headers: headers, body: body)
+        expect(Faraday).to receive(:post).with(AmplitudeAPI::TRACK_URI_STRING, body, headers)
 
         described_class.track([event, event2])
       end
@@ -103,7 +103,7 @@ describe AmplitudeAPI do
             identification: JSON.generate([identification.to_hash])
           }
 
-          expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+          expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body)
 
           described_class.identify(identification)
         end
@@ -123,7 +123,7 @@ describe AmplitudeAPI do
             identification: JSON.generate([identification.to_hash])
           }
 
-          expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+          expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body)
 
           described_class.identify(identification)
         end
@@ -144,7 +144,7 @@ describe AmplitudeAPI do
             identification: JSON.generate([identification.to_hash])
           }
 
-          expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+          expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body)
 
           described_class.identify(identification)
         end
@@ -172,7 +172,7 @@ describe AmplitudeAPI do
           identification: JSON.generate([identification.to_hash, identification2.to_hash])
         }
 
-        expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body: body)
+        expect(Faraday).to receive(:post).with(AmplitudeAPI::IDENTIFY_URI_STRING, body)
 
         described_class.identify([identification, identification2])
       end
