@@ -178,25 +178,32 @@ class AmplitudeAPI
     # is requesting the deletion, optional but useful for reporting
     #
     # @return [ Faraday::Response ]
-    def delete(user_ids: nil, amplitude_ids: nil, requester: nil)
+    def delete(user_ids: nil, amplitude_ids: nil, requester: nil, ignore_invalid_id: nil, delete_from_org: nil)
       user_ids = Array(user_ids)
       amplitude_ids = Array(amplitude_ids)
 
-      Faraday.new(DELETION_URI_STRING) do |conn|
+      faraday = Faraday.new do |conn|
         conn.basic_auth config.api_key, config.secret_key
-      end.post
+      end
+
+      faraday.post(
+        DELETION_URI_STRING,
+        delete_body(user_ids, amplitude_ids, requester, ignore_invalid_id, delete_from_org),
+        { 'Content-Type' => 'application/json' }
+      )
     end
 
     private
 
-    def delete_body(user_ids, amplitude_ids, requester)
-      JSON.generate(
-        {
-          amplitude_ids: amplitude_ids,
-          user_ids: user_ids,
-          requester: requester
-        }.delete_if { |_, value| value.nil? || value.empty? }
-      )
+    def delete_body(user_ids, amplitude_ids, requester, ignore_invalid_id, delete_from_org)
+      body = {
+        amplitude_ids: amplitude_ids,
+        user_ids: user_ids,
+        requester: requester,
+      }.delete_if { |_, value| value.nil? || value.empty? }
+
+      body.merge! ignore_invalid_id: ignore_invalid_id.to_s if ignore_invalid_id
+      JSON.generate(body)
     end
   end
 end

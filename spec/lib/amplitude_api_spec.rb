@@ -382,36 +382,70 @@ describe AmplitudeAPI do
   end
 
   describe '.delete' do
-    context 'a single user_id' do
-      it 'correctly formats the response' do
+    let(:connection) { connection =  double("Faraday::Connection", post: nil, basic_auth: nil) }
+
+    before do
+      allow(Faraday).to receive(:new).and_yield(connection).and_return(connection)
+      allow(Faraday).to receive(:post)
+    end
+
+    it "sends the authentification" do
+      api_key = described_class.config.api_key
+      secret_key = described_class.config.secret_key
+
+      described_class.delete(user_ids: '123')
+
+      expect(connection).to have_received(:basic_auth).with(api_key, secret_key)
+    end
+
+    it "sends the ignore_invalid_id flag" do
+      body = {
+        user_ids: ['123'],
+        ignore_invalid_id: "true"
+      }
+
+      described_class.delete(user_ids: '123', ignore_invalid_id: true)
+
+      expect(connection).to have_received(:post).with(
+        AmplitudeAPI::DELETION_URI_STRING,
+        JSON.generate(body),
+        { 'Content-Type' => 'application/json' }
+      )
+    end
+
+    it "sends the delete_from_org flag" do
+    end
+
+    context 'with a single user_id' do
+      it 'sends the deletion to Amplitude' do
         body = {
           user_ids: ['123']
         }
 
-        expect(Faraday).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: JSON.generate(body),
-          headers: { 'Content-Type' => 'application/json' }
-        )
         described_class.delete(user_ids: '123')
+
+        expect(connection).to have_received(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          JSON.generate(body),
+          { 'Content-Type' => 'application/json' }
+        )
       end
     end
 
-    context 'with user_ids' do
+    context 'with multiple user_ids' do
       it 'sends the deletion to Amplitude' do
         user_ids =  [123, 456, 555]
         body = {
           user_ids: user_ids
         }
 
-        expect(Faraday).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: JSON.generate(body),
-          headers: { 'Content-Type' => 'application/json' }
-        )
         described_class.delete(user_ids: user_ids)
+
+        expect(connection).to have_received(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          JSON.generate(body),
+          { 'Content-Type' => 'application/json' }
+        )
       end
 
       context 'with amplitude_ids' do
