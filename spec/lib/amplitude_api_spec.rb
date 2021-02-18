@@ -393,9 +393,25 @@ describe AmplitudeAPI do
       api_key = described_class.config.api_key
       secret_key = described_class.config.secret_key
 
-      described_class.delete(user_ids: '123')
+      described_class.delete(user_ids: "123")
 
       expect(connection).to have_received(:basic_auth).with(api_key, secret_key)
+    end
+
+    it 'sends the requester' do
+      requester = 'privacy@gethopscotch.com'
+      body = {
+        amplitude_ids: ["123"],
+        requester: requester
+      }
+
+      described_class.delete(amplitude_ids: "123", requester: requester)
+
+      expect(connection).to have_received(:post).with(
+        AmplitudeAPI::DELETION_URI_STRING,
+        JSON.generate(body),
+        { 'Content-Type' => 'application/json' }
+      )
     end
 
     it "sends the ignore_invalid_id flag" do
@@ -414,12 +430,24 @@ describe AmplitudeAPI do
     end
 
     it "sends the delete_from_org flag" do
+      body = {
+        user_ids: ['123'],
+        delete_from_org: "true"
+      }
+
+      described_class.delete(user_ids: '123', delete_from_org: true)
+
+      expect(connection).to have_received(:post).with(
+        AmplitudeAPI::DELETION_URI_STRING,
+        JSON.generate(body),
+        { 'Content-Type' => 'application/json' }
+      )
     end
 
-    context 'with a single user_id' do
-      it 'sends the deletion to Amplitude' do
+    context 'with a single user' do
+      it 'sends the user_id to Amplitude' do
         body = {
-          user_ids: ['123']
+          user_ids: ["123"]
         }
 
         described_class.delete(user_ids: '123')
@@ -430,10 +458,39 @@ describe AmplitudeAPI do
           { 'Content-Type' => 'application/json' }
         )
       end
+
+      it "sends the amplitude_id to Amplitude" do
+        body = {
+          amplitude_ids: ["123"]
+        }
+
+        described_class.delete(amplitude_ids: "123")
+
+        expect(connection).to have_received(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          JSON.generate(body),
+          { 'Content-Type' => 'application/json' }
+        )
+      end
+
+      it "sends both user_id and amplitude_id to Amplitude" do
+        body = {
+          amplitude_ids: ["123"],
+          user_ids: ["456"]
+        }
+
+        described_class.delete(user_ids: "456", amplitude_ids: "123")
+
+        expect(connection).to have_received(:post).with(
+          AmplitudeAPI::DELETION_URI_STRING,
+          JSON.generate(body),
+          { 'Content-Type' => 'application/json' }
+        )
+      end
     end
 
     context 'with multiple user_ids' do
-      it 'sends the deletion to Amplitude' do
+      it 'sends the user_ids to Amplitude' do
         user_ids =  [123, 456, 555]
         body = {
           user_ids: user_ids
@@ -448,81 +505,35 @@ describe AmplitudeAPI do
         )
       end
 
-      context 'with amplitude_ids' do
-        it 'sends the deletion to Amplitude' do
-          user_ids =  [123, 456, 555]
-          amplitude_ids = [122, 456]
-          body = {
-            amplitude_ids: amplitude_ids,
-            user_ids: user_ids
-          }
-
-          expect(Faraday).to receive(:post).with(
-            AmplitudeAPI::DELETION_URI_STRING,
-            userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-            body: JSON.generate(body),
-            headers: { 'Content-Type' => 'application/json' }
-          )
-          described_class.delete(
-            amplitude_ids: amplitude_ids,
-            user_ids: user_ids
-          )
-        end
-      end
-    end
-
-    context 'with amplitude_ids' do
-      it 'sends the deletion to Amplitude' do
+      it "sends the amplitude_ids to Amplitude" do
         amplitude_ids = [122, 456]
         body = {
-          amplitude_ids: amplitude_ids
+          amplitude_ids: amplitude_ids,
         }
 
-        expect(Faraday).to receive(:post).with(
-          AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: JSON.generate(body),
-          headers: { 'Content-Type' => 'application/json' }
-        )
         described_class.delete(amplitude_ids: amplitude_ids)
-      end
-    end
 
-    context 'a single amplitude_id' do
-      it 'correctly formats the response' do
-        body = {
-          amplitude_ids: [122]
-        }
-
-        expect(Faraday).to receive(:post).with(
+        expect(connection).to have_received(:post).with(
           AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: "#{described_class.api_key}:#{described_class.config.secret_key}",
-          body: JSON.generate(body),
-          headers: { 'Content-Type' => 'application/json' }
+          JSON.generate(body),
+          { 'Content-Type' => 'application/json' }
         )
-        described_class.delete(amplitude_ids: 122)
       end
-    end
 
-    context 'with requester' do
-      it 'sends the deletion to Amplitude' do
+      it "sends both user_ids and amplitude_ids to Amplitude" do
+        user_ids =  [123, 456, 555]
         amplitude_ids = [122, 456]
-
         body = {
           amplitude_ids: amplitude_ids,
-          requester: 'privacy@gethopscotch.com'
+          user_ids: user_ids
         }
-        userpwd = "#{described_class.api_key}:#{described_class.config.secret_key}"
 
-        expect(Faraday).to receive(:post).with(
+        described_class.delete(user_ids: user_ids, amplitude_ids: amplitude_ids)
+
+        expect(connection).to have_received(:post).with(
           AmplitudeAPI::DELETION_URI_STRING,
-          userpwd: userpwd,
-          body: JSON.generate(body),
-          headers: { 'Content-Type' => 'application/json' }
-        )
-        described_class.delete(
-          amplitude_ids: amplitude_ids,
-          requester: 'privacy@gethopscotch.com'
+          JSON.generate(body),
+          { 'Content-Type' => 'application/json' }
         )
       end
     end

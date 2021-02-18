@@ -203,6 +203,7 @@ class AmplitudeAPI
       }.delete_if { |_, value| value.nil? || value.empty? }
 
       body.merge! ignore_invalid_id: ignore_invalid_id.to_s if ignore_invalid_id
+      body.merge! delete_from_org: delete_from_org.to_s if delete_from_org
       JSON.generate(body)
     end
   end
