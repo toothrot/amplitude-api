@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'faraday'
+require "json"
+require "faraday"
 
 # AmplitudeAPI
 class AmplitudeAPI
-  require_relative 'amplitude_api/config'
-  require_relative 'amplitude_api/event'
-  require_relative 'amplitude_api/identification'
+  require_relative "amplitude_api/config"
+  require_relative "amplitude_api/event"
+  require_relative "amplitude_api/identification"
 
-  TRACK_URI_STRING        = 'https://api.amplitude.com/2/httpapi'
-  IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'
-  SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'
-  DELETION_URI_STRING     = 'https://amplitude.com/api/2/deletions/users'
+  TRACK_URI_STRING        = "https://api.amplitude.com/2/httpapi"
+  IDENTIFY_URI_STRING     = "https://api.amplitude.com/identify"
+  SEGMENTATION_URI_STRING = "https://amplitude.com/api/2/events/segmentation"
+  DELETION_URI_STRING     = "https://amplitude.com/api/2/deletions/users"
 
   USER_WITH_NO_ACCOUNT = "user who doesn't have an account"
 
@@ -70,10 +70,10 @@ class AmplitudeAPI
     def track_body(*events)
       event_body = events.flatten.map(&:to_hash)
 
-      JSON.generate({
+      JSON.generate(
         api_key: api_key,
         events: event_body
-      })
+      )
     end
 
     # @overload track(event)
@@ -86,7 +86,7 @@ class AmplitudeAPI
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
-      Faraday.post(TRACK_URI_STRING, track_body(events), { 'Content-Type' => 'application/json' })
+      Faraday.post(TRACK_URI_STRING, track_body(events), "Content-Type" => "application/json")
     end
 
     # ==== Identification related methods
@@ -157,8 +157,8 @@ class AmplitudeAPI
       Faraday.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
         e: event.to_json,
         m: options[:m],
-        start: start_time.strftime('%Y%m%d'),
-        end: end_time.strftime('%Y%m%d'),
+        start: start_time.strftime("%Y%m%d"),
+        end: end_time.strftime("%Y%m%d"),
         i: options[:i],
         s: (options[:s] || []).map(&:to_json),
         g: options[:g],
@@ -189,7 +189,7 @@ class AmplitudeAPI
       faraday.post(
         DELETION_URI_STRING,
         delete_body(user_ids, amplitude_ids, requester, ignore_invalid_id, delete_from_org),
-        { 'Content-Type' => 'application/json' }
+        "Content-Type" => "application/json"
       )
     end
 
@@ -199,11 +199,11 @@ class AmplitudeAPI
       body = {
         amplitude_ids: amplitude_ids,
         user_ids: user_ids,
-        requester: requester,
+        requester: requester
       }.delete_if { |_, value| value.nil? || value.empty? }
 
-      body.merge! ignore_invalid_id: ignore_invalid_id.to_s if ignore_invalid_id
-      body.merge! delete_from_org: delete_from_org.to_s if delete_from_org
+      body[:ignore_invalid_id] = ignore_invalid_id.to_s if ignore_invalid_id
+      body[:delete_from_org] = delete_from_org.to_s if delete_from_org
       JSON.generate(body)
     end
   end

@@ -18,7 +18,7 @@ class AmplitudeAPI
     # @param [ String ] user_id a user_id to associate with the identification
     # @param [ String ] device_id a device_id to associate with the identification
     # @param [ Hash ] user_properties various properties to attach to the user identification
-    def initialize(user_id: '', device_id: nil, user_properties: {})
+    def initialize(user_id: "", device_id: nil, user_properties: {})
       self.user_id = user_id
       self.device_id = device_id if device_id
       self.user_properties = user_properties

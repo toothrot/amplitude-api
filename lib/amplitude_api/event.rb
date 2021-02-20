@@ -54,12 +54,12 @@ class AmplitudeAPI
     #
     # Returns true if the event type matches one reserved by Amplitude API.
     def reserved_event?(type)
-      ['[Amplitude] Start Session',
-       '[Amplitude] End Session',
-       '[Amplitude] Revenue',
-       '[Amplitude] Revenue (Verified)',
-       '[Amplitude] Revenue (Unverified)',
-       '[Amplitude] Merged User'].include?(type)
+      ["[Amplitude] Start Session",
+       "[Amplitude] End Session",
+       "[Amplitude] Revenue",
+       "[Amplitude] Revenue (Verified)",
+       "[Amplitude] Revenue (Unverified)",
+       "[Amplitude] Merged User"].include?(type)
     end
 
     # @return [ true, false ]
@@ -91,15 +91,15 @@ class AmplitudeAPI
     end
 
     def validate_required_arguments
-      raise ArgumentError, 'You must provide user_id or device_id (or both)' unless user_id || device_id
-      raise ArgumentError, 'You must provide event_type' unless event_type
-      raise ArgumentError, 'Invalid event_type - cannot match a reserved event name' if reserved_event?(event_type)
+      raise ArgumentError, "You must provide user_id or device_id (or both)" unless user_id || device_id
+      raise ArgumentError, "You must provide event_type" unless event_type
+      raise ArgumentError, "Invalid event_type - cannot match a reserved event name" if reserved_event?(event_type)
     end
 
     def validate_revenue_arguments
       return self.quantity ||= 1 if price
-      raise ArgumentError, 'You must provide a price in order to use the product_id' if product_id
-      raise ArgumentError, 'You must provide a price in order to use the revenue_type' if revenue_type
+      raise ArgumentError, "You must provide a price in order to use the product_id" if product_id
+      raise ArgumentError, "You must provide a price in order to use the revenue_type" if revenue_type
     end
 
     def revenue_hash
