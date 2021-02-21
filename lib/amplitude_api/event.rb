@@ -9,7 +9,7 @@ class AmplitudeAPI
 
     # Create a new Event
     #
-    # See (Amplitude HTTP API Documentation)[https://amplitude.zendesk.com/hc/en-us/articles/204771828-HTTP-API]
+    # See (Amplitude HTTP API Documentation)[https://developers.amplitude.com/docs/http-api-v2]
     # for a list of valid parameters and their types.
     def initialize(attributes = {})
       attributes.each do |k, v|
