@@ -322,4 +322,46 @@ describe AmplitudeAPI::Event do
       end
     end
   end
+
+  describe "arbitrary properties" do
+    # We need to create a class for each test because the methods we are calling
+    # in this test group are modifying the class
+    let(:klass) {
+      Class.new described_class
+    }
+
+    let(:event) {
+      klass.new(
+        user_id: 123,
+        event_type: "bad event"
+      )
+    }
+
+    it "creates arbitrary properties when assigning values" do
+      event.arbitrary_property = "arbitrary value"
+
+      expect(event.arbitrary_property).to eq "arbitrary value"
+    end
+
+    it "responds_to? arbitrary properties" do
+      event.arbitrary_property = "arbitrary value"
+
+      expect(event.respond_to?(:arbitrary_property)).to be true
+      expect(event.respond_to?(:arbitrary_property=)).to be true
+    end
+
+    it "do not accepts blocks when assigning values to create properties" do
+      expect do
+        event.arbitrary_property { puts "whatever" }
+      end.to raise_error NoMethodError
+    end
+
+    it "includes arbitrary properties in the generated hash" do
+      event.arbitrary_property = "arbitrary value"
+
+      hash = event.to_hash
+
+      expect(hash).to include({ arbitrary_property: "arbitrary value" })
+    end
+  end
 end

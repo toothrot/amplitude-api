@@ -20,11 +20,33 @@ class AmplitudeAPI
     end
 
     def method_missing(method_name, *args, &block)
-      raise NoMethodError
+      raise NoMethodError, "undefined method '#{method_name}' for #{self}" if block_given?
+
+      property_name = method_name.to_s.delete_suffix("=")
+
+      @extra_properties << property_name
+
+      create_setter property_name
+      create_getter property_name
+
+      self.send("#{property_name}=".to_sym, *args)
+    end
+
+    def create_setter(attribute_name)
+      self.class.send(:define_method, "#{attribute_name}=".to_sym) do |value|
+        instance_variable_set("@" + attribute_name.to_s, value)
+      end
+    end
+
+    def create_getter(attribute_name)
+      self.class.send(:define_method, attribute_name.to_sym) do
+        instance_variable_get("@" + attribute_name.to_s)
+      end
     end
 
     def respond_to_missing?(method_name, *args)
-      @extra_properties.include? method_name or super
+      @extra_properties.include? method_name or
+      @extra_properties.include? "#{method_name}=" or super
     end
 
     def user_id=(value)
@@ -47,15 +69,29 @@ class AmplitudeAPI
       }
       event[:user_id] = user_id if user_id
       event[:device_id] = device_id if device_id
-      event.merge(optional_properties).merge(revenue_hash)
+      event.merge(optional_properties).merge(revenue_hash).merge(extra_properties)
     end
     alias to_h to_hash
 
     # @return [ Hash ] Optional properties
+    #
+    # Returns optional properties (belong to the API but are optional)
     def optional_properties
       AmplitudeAPI::Config.optional_properties.map do |prop|
         val = prop == :time ? formatted_time : send(prop)
         val ? [prop, val] : nil
+      end.compact.to_h
+    end
+
+    # @return [ Hash ] Extra properties
+    #
+    # Returns optional properties (not belong to the API, are assigned by the user)
+    # This way, if the API is updated with new properties, the gem will be able
+    # to work with the new specification until the code is modified
+    def extra_properties
+      @extra_properties.map do |prop|
+        val = send(prop)
+        val ? [prop.to_sym, val] : nil
       end.compact.to_h
     end
 
