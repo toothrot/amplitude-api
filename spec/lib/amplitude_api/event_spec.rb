@@ -99,14 +99,63 @@ describe AmplitudeAPI::Event do
     end
 
     context "the user sends a revenue_type or a product_id" do
+
       it "raises an error if there is not a price neither a revenue" do
-        pending
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            product_id: "hopscotch.4lyfe"
+          )
+        end.to raise_error ArgumentError, /You must provide a price or a revenue/
+
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            revenue_type: "whatever",
+          )
+        end.to raise_error ArgumentError, /You must provide a price or a revenue/
       end
+
       it "does not raise an error if there is a price" do
-        pending
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            product_id: "hopscotch.4lyfe",
+            price: 10.2
+          )
+        end.not_to raise_error
+
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            revenue_type: "whatever",
+            price: 10.2
+          )
+        end.not_to raise_error
       end
+
       it "does not raise an error if there is a revenue" do
-        pending
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            product_id: "hopscotch.4lyfe",
+            revenue: 100.1
+          )
+        end.not_to raise_error
+
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            revenue_type: "whatever",
+            revenue: 100.1
+          )
+        end.not_to raise_error
       end
     end
 
