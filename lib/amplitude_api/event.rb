@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# This class is 115 lines long. It's on the limit, it should be refactored before
+# including more code.
+#
+# rubocop:disable Metrics/ClassLength
 class AmplitudeAPI
   # AmplitudeAPI::Event
   class Event
@@ -19,8 +23,8 @@ class AmplitudeAPI
       @extra_properties = []
     end
 
-    def method_missing(method_name, *args, &block)
-      raise NoMethodError, "undefined method '#{method_name}' for #{self}" if block_given?
+    def method_missing(method_name, *args)
+      super if block_given?
 
       property_name = method_name.to_s.delete_suffix("=")
 
@@ -29,7 +33,7 @@ class AmplitudeAPI
       create_setter property_name
       create_getter property_name
 
-      self.send("#{property_name}=".to_sym, *args)
+      send("#{property_name}=".to_sym, *args)
     end
 
     def create_setter(attribute_name)
@@ -45,8 +49,7 @@ class AmplitudeAPI
     end
 
     def respond_to_missing?(method_name, *args)
-      @extra_properties.include? method_name or
-      @extra_properties.include? "#{method_name}=" or super
+      @extra_properties.include?(method_name) || @extra_properties.include?("#{method_name}=") || super
     end
 
     def user_id=(value)
@@ -143,7 +146,7 @@ class AmplitudeAPI
 
     def validate_revenue_arguments
       return true if !revenue_type && !product_id
-      return true if revenue or price
+      return true if revenue || price
 
       raise ArgumentError, revenue_error_message
     end
@@ -170,3 +173,4 @@ class AmplitudeAPI
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
