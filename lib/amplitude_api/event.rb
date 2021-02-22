@@ -16,6 +16,37 @@ class AmplitudeAPI
         send("#{k}=", v) if respond_to?("#{k}=")
       end
       validate_arguments
+      @extra_properties = []
+    end
+
+    def method_missing(method_name, *args, &block)
+      raise NoMethodError, "undefined method '#{method_name}' for #{self}" if block_given?
+
+      property_name = method_name.to_s.delete_suffix("=")
+
+      @extra_properties << property_name
+
+      create_setter property_name
+      create_getter property_name
+
+      self.send("#{property_name}=".to_sym, *args)
+    end
+
+    def create_setter(attribute_name)
+      self.class.send(:define_method, "#{attribute_name}=".to_sym) do |value|
+        instance_variable_set("@" + attribute_name.to_s, value)
+      end
+    end
+
+    def create_getter(attribute_name)
+      self.class.send(:define_method, attribute_name.to_sym) do
+        instance_variable_get("@" + attribute_name.to_s)
+      end
+    end
+
+    def respond_to_missing?(method_name, *args)
+      @extra_properties.include? method_name or
+      @extra_properties.include? "#{method_name}=" or super
     end
 
     def user_id=(value)
@@ -38,15 +69,29 @@ class AmplitudeAPI
       }
       event[:user_id] = user_id if user_id
       event[:device_id] = device_id if device_id
-      event.merge(optional_properties).merge(revenue_hash)
+      event.merge(optional_properties).merge(revenue_hash).merge(extra_properties)
     end
     alias to_h to_hash
 
     # @return [ Hash ] Optional properties
+    #
+    # Returns optional properties (belong to the API but are optional)
     def optional_properties
-      %i[device_id time ip platform country insert_id].map do |prop|
+      AmplitudeAPI::Config.optional_properties.map do |prop|
         val = prop == :time ? formatted_time : send(prop)
         val ? [prop, val] : nil
+      end.compact.to_h
+    end
+
+    # @return [ Hash ] Extra properties
+    #
+    # Returns optional properties (not belong to the API, are assigned by the user)
+    # This way, if the API is updated with new properties, the gem will be able
+    # to work with the new specification until the code is modified
+    def extra_properties
+      @extra_properties.map do |prop|
+        val = send(prop)
+        val ? [prop.to_sym, val] : nil
       end.compact.to_h
     end
 
@@ -97,9 +142,17 @@ class AmplitudeAPI
     end
 
     def validate_revenue_arguments
-      return self.quantity ||= 1 if price
-      raise ArgumentError, "You must provide a price in order to use the product_id" if product_id
-      raise ArgumentError, "You must provide a price in order to use the revenue_type" if revenue_type
+      return true if !revenue_type && !product_id
+      return true if revenue or price
+
+      raise ArgumentError, revenue_error_message
+    end
+
+    def revenue_error_message
+      error_field = "product_id" if product_id
+      error_field = "revenue_type" if revenue_type
+
+      "You must provide a price or a revenue in order to use the field #{error_field}"
     end
 
     def revenue_hash
@@ -108,6 +161,7 @@ class AmplitudeAPI
       revenue_hash[:revenueType] = revenue_type if revenue_type
       revenue_hash[:quantity] = quantity if quantity
       revenue_hash[:price] = price if price
+      revenue_hash[:revenue] = revenue if revenue
       revenue_hash
     end
 

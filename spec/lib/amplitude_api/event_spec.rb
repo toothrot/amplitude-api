@@ -98,25 +98,63 @@ describe AmplitudeAPI::Event do
       end
     end
 
-    context "the user does not send in a price" do
-      it "raises an error if the user sends in a product_id" do
+    context "the user sends a revenue_type or a product_id" do
+      it "raises an error if there is not a price neither a revenue" do
         expect do
           described_class.new(
             user_id: 123,
             event_type: "bad event",
             product_id: "hopscotch.4lyfe"
           )
-        end.to raise_error(ArgumentError)
-      end
+        end.to raise_error ArgumentError, /You must provide a price or a revenue/
 
-      it "raises an error if the user sends in a revenue_type" do
         expect do
           described_class.new(
             user_id: 123,
             event_type: "bad event",
-            revenue_type: "tax return"
+            revenue_type: "whatever",
           )
-        end.to raise_error(ArgumentError)
+        end.to raise_error ArgumentError, /You must provide a price or a revenue/
+      end
+
+      it "does not raise an error if there is a price" do
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            product_id: "hopscotch.4lyfe",
+            price: 10.2
+          )
+        end.not_to raise_error
+
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            revenue_type: "whatever",
+            price: 10.2
+          )
+        end.not_to raise_error
+      end
+
+      it "does not raise an error if there is a revenue" do
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            product_id: "hopscotch.4lyfe",
+            revenue: 100.1
+          )
+        end.not_to raise_error
+
+        expect do
+          described_class.new(
+            user_id: 123,
+            event_type: "bad event",
+            revenue_type: "whatever",
+            revenue: 100.1
+          )
+        end.not_to raise_error
       end
     end
   end
@@ -227,25 +265,26 @@ describe AmplitudeAPI::Event do
         expect(event.to_hash[:price]).to eq(price)
       end
 
-      it "sets the quantity to 1 if the price is set and the quantity is not" do
-        price = 100_000.99
-        event = described_class.new(
-          user_id: 123,
-          event_type: "clicked on home",
-          price: price
-        )
-        expect(event.to_hash[:quantity]).to eq(1)
-      end
-
       it "includes the quantity if it is set" do
         quantity = 100
         event = described_class.new(
           user_id: 123,
-          event_type: "clicked on home",
+          event_type: 'clicked on home',
           quantity: quantity,
           price: 10.99
         )
         expect(event.to_hash[:quantity]).to eq(quantity)
+      end
+
+      it "includes the revenue if it is set" do
+        revenue = 100
+        event = described_class.new(
+          user_id: 123,
+          event_type: 'clicked on home',
+          quantity: 456,
+          revenue: revenue
+        )
+        expect(event.to_hash[:revenue]).to eq(revenue)
       end
 
       it "includes the productID if set" do
@@ -280,6 +319,48 @@ describe AmplitudeAPI::Event do
         expect(event.to_hash).not_to have_key(:productId)
         expect(event.to_hash).not_to have_key(:price)
       end
+    end
+  end
+
+  describe "arbitrary properties" do
+    # We need to create a class for each test because the methods we are calling
+    # in this test group are modifying the class
+    let(:klass) {
+      Class.new described_class
+    }
+
+    let(:event) {
+      klass.new(
+        user_id: 123,
+        event_type: "bad event"
+      )
+    }
+
+    it "creates arbitrary properties when assigning values" do
+      event.arbitrary_property = "arbitrary value"
+
+      expect(event.arbitrary_property).to eq "arbitrary value"
+    end
+
+    it "responds_to? arbitrary properties" do
+      event.arbitrary_property = "arbitrary value"
+
+      expect(event.respond_to?(:arbitrary_property)).to be true
+      expect(event.respond_to?(:arbitrary_property=)).to be true
+    end
+
+    it "do not accepts blocks when assigning values to create properties" do
+      expect do
+        event.arbitrary_property { puts "whatever" }
+      end.to raise_error NoMethodError
+    end
+
+    it "includes arbitrary properties in the generated hash" do
+      event.arbitrary_property = "arbitrary value"
+
+      hash = event.to_hash
+
+      expect(hash).to include({ arbitrary_property: "arbitrary value" })
     end
   end
 end
