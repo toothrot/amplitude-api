@@ -176,7 +176,10 @@ class AmplitudeAPI
     # based on the amplitude database
     # @param [ String ] requester the email address of the person who
     # is requesting the deletion, optional but useful for reporting
-    #
+    # @param [ Boolean ] (optional) ignore any invalid user IDs(users that do no
+    # exist in the project) that were passed in
+    # @param [ Boolean ] (optional) delete from the entire org rather than just
+    # this project.
     # @return [ Faraday::Response ]
     def delete(user_ids: nil, amplitude_ids: nil, requester: nil, ignore_invalid_id: nil, delete_from_org: nil)
       user_ids = Array(user_ids)
