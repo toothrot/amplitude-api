@@ -158,28 +158,6 @@ describe AmplitudeAPI::Event do
         end.not_to raise_error
       end
     end
-
-    context "the user does not send neither a price nor a revenue" do
-      it 'raises an error if the user sends in a product_id' do
-        expect do
-          described_class.new(
-            user_id: 123,
-            event_type: 'bad event',
-            product_id: 'hopscotch.4lyfe'
-          )
-        end.to raise_error(ArgumentError)
-      end
-
-      it 'raises an error if the user sends in a revenue_type' do
-        expect do
-          described_class.new(
-            user_id: 123,
-            event_type: 'bad event',
-            revenue_type: 'tax return'
-          )
-        end.to raise_error(ArgumentError)
-      end
-    end
   end
 
   describe '#to_hash' do
