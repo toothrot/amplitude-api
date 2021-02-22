@@ -6,6 +6,17 @@ AllCops:
 Metrics/LineLength:
   Max: 120
 
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+  SupportedStyles:
+    - single_quotes
+    - double_quotes
+
+Style/BlockDelimiters:
+  Enabled: true
+  Exclude:
+    - spec/**/*
+
 # Disable some failing rspec cops that fail from upgrading gems until we can clean things up a bit.
 Naming/FileName:
   Exclude:

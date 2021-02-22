@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'typhoeus'
+require "json"
+require "faraday"
 
 # AmplitudeAPI
 class AmplitudeAPI
-  require_relative 'amplitude_api/config'
-  require_relative 'amplitude_api/event'
-  require_relative 'amplitude_api/identification'
+  require_relative "amplitude_api/config"
+  require_relative "amplitude_api/event"
+  require_relative "amplitude_api/identification"
 
-  TRACK_URI_STRING        = 'https://api.amplitude.com/2/httpapi'
-  IDENTIFY_URI_STRING     = 'https://api.amplitude.com/identify'
-  SEGMENTATION_URI_STRING = 'https://amplitude.com/api/2/events/segmentation'
-  DELETION_URI_STRING     = 'https://amplitude.com/api/2/deletions/users'
+  TRACK_URI_STRING        = "https://api.amplitude.com/2/httpapi"
+  IDENTIFY_URI_STRING     = "https://api.amplitude.com/identify"
+  SEGMENTATION_URI_STRING = "https://amplitude.com/api/2/events/segmentation"
+  DELETION_URI_STRING     = "https://amplitude.com/api/2/deletions/users"
 
   USER_WITH_NO_ACCOUNT = "user who doesn't have an account"
 
@@ -45,7 +45,7 @@ class AmplitudeAPI
     # @option options [ Hash ] user_properties a hash that is serialized to JSON,
     # and contains user properties to be associated with the user
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     def send_event(event_name, user, device, options = {})
       event = AmplitudeAPI::Event.new(
         user_id: user,
@@ -70,10 +70,10 @@ class AmplitudeAPI
     def track_body(*events)
       event_body = events.flatten.map(&:to_hash)
 
-      JSON.generate({
+      JSON.generate(
         api_key: api_key,
         events: event_body
-      })
+      )
     end
 
     # @overload track(event)
@@ -82,14 +82,11 @@ class AmplitudeAPI
     # @overload track([events])
     #   @param [ Array<AmplitudeAPI::Event> ] Send an array of events in a single request to Amplitude
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
-      Typhoeus.post(
-        TRACK_URI_STRING,
-        headers: { 'Content-Type' => 'application/json' },
-        body: track_body(events))
+      Faraday.post(TRACK_URI_STRING, track_body(events), "Content-Type" => "application/json")
     end
 
     # ==== Identification related methods
@@ -128,11 +125,11 @@ class AmplitudeAPI
     # @overload identify([identifications])
     #   @param [ Array<AmplitudeAPI::Identify> ] Send an array of identifications in a single request to Amplitude
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     #
     # Send one or more Identifications to the Amplitude Identify API
     def identify(*identifications)
-      Typhoeus.post(IDENTIFY_URI_STRING, body: identify_body(identifications))
+      Faraday.post(IDENTIFY_URI_STRING, identify_body(identifications))
     end
 
     # ==== Event Segmentation related methods
@@ -155,13 +152,13 @@ class AmplitudeAPI
     # @option options [ Integer ] limit an integer that defines number of Group By values
     # returned (default: 100). The maximum limit is 1000.
     #
-    # @return [ Typhoeus::Response ]
+    # @return [ Faraday::Response ]
     def segmentation(event, start_time, end_time, **options)
-      Typhoeus.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
+      Faraday.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
         e: event.to_json,
         m: options[:m],
-        start: start_time.strftime('%Y%m%d'),
-        end: end_time.strftime('%Y%m%d'),
+        start: start_time.strftime("%Y%m%d"),
+        end: end_time.strftime("%Y%m%d"),
         i: options[:i],
         s: (options[:s] || []).map(&:to_json),
         g: options[:g],
@@ -179,29 +176,38 @@ class AmplitudeAPI
     # based on the amplitude database
     # @param [ String ] requester the email address of the person who
     # is requesting the deletion, optional but useful for reporting
-    #
-    # @return [ Typhoeus::Response ]
-    def delete(user_ids: nil, amplitude_ids: nil, requester: nil)
+    # @param [ Boolean ] (optional) ignore any invalid user IDs(users that do no
+    # exist in the project) that were passed in
+    # @param [ Boolean ] (optional) delete from the entire org rather than just
+    # this project.
+    # @return [ Faraday::Response ]
+    def delete(user_ids: nil, amplitude_ids: nil, requester: nil, ignore_invalid_id: nil, delete_from_org: nil)
       user_ids = Array(user_ids)
       amplitude_ids = Array(amplitude_ids)
-      Typhoeus.post(
+
+      faraday = Faraday.new do |conn|
+        conn.basic_auth config.api_key, config.secret_key
+      end
+
+      faraday.post(
         DELETION_URI_STRING,
-        userpwd: "#{api_key}:#{config.secret_key}",
-        body: delete_body(user_ids, amplitude_ids, requester),
-        headers: { 'Content-Type' => 'application/json' }
+        delete_body(user_ids, amplitude_ids, requester, ignore_invalid_id, delete_from_org),
+        "Content-Type" => "application/json"
       )
     end
 
     private
 
-    def delete_body(user_ids, amplitude_ids, requester)
-      JSON.generate(
-        {
-          amplitude_ids: amplitude_ids,
-          user_ids: user_ids,
-          requester: requester
-        }.delete_if { |_, value| value.nil? || value.empty? }
-      )
+    def delete_body(user_ids, amplitude_ids, requester, ignore_invalid_id, delete_from_org)
+      body = {
+        amplitude_ids: amplitude_ids,
+        user_ids: user_ids,
+        requester: requester
+      }.delete_if { |_, value| value.nil? || value.empty? }
+
+      body[:ignore_invalid_id] = ignore_invalid_id.to_s if ignore_invalid_id
+      body[:delete_from_org] = delete_from_org.to_s if delete_from_org
+      JSON.generate(body)
     end
   end
 end
