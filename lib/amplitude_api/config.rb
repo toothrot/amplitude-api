@@ -8,7 +8,8 @@ class AmplitudeAPI
     include Singleton
 
     attr_accessor :api_key, :secret_key, :whitelist, :time_formatter,
-                  :event_properties_formatter, :user_properties_formatter
+                  :event_properties_formatter, :user_properties_formatter,
+                  :options
 
     def initialize
       self.class.defaults.each { |k, v| send("#{k}=", v) }

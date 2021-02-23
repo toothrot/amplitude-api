@@ -3,9 +3,12 @@
 We would like to think our many [contributors](https://github.com/toothrot/amplitude-api/graphs/contributors) for
 suggestions, ideas and improvements to Amplitude API.
 
+## 0.3.1 (2021-02-23)
+* Solves an error when creating event with missing properties
+
 ## 0.3.0 (2021-02-22)
 
-* Changes Typhoeus to Faraday to launch requests
+* Changes Typhoeus to Faraday to launch requests (**breaking change**)
 * Adds new API fields to Event
 * Event can now include arbitrary properties, so it could be used if the API adds new ones.
 

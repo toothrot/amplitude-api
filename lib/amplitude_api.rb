@@ -70,10 +70,13 @@ class AmplitudeAPI
     def track_body(*events)
       event_body = events.flatten.map(&:to_hash)
 
-      JSON.generate(
+      body = {
         api_key: api_key,
         events: event_body
-      )
+      }
+      body[:options] = config.options if config.options
+
+      JSON.generate(body)
     end
 
     # @overload track(event)

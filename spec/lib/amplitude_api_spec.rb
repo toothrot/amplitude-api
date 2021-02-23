@@ -7,7 +7,32 @@ describe AmplitudeAPI do
   let(:device_id) { "abcdef" }
 
   describe ".track" do
+    before do
+      described_class.config.options = nil
+    end
+
     context "with a single event" do
+      it "can send options" do
+        event = AmplitudeAPI::Event.new(
+          user_id: 123,
+          event_type: "clicked on sign up"
+        )
+        options = { min_id_length: 456 }
+        described_class.config.options = options
+
+        allow(Faraday).to receive(:post)
+
+        described_class.track(event)
+
+        headers = { "Content-Type" => "application/json" }
+        body = JSON.generate(
+          api_key: described_class.api_key,
+          events: [event.to_hash],
+          options: options
+        )
+        expect(Faraday).to have_received(:post).with(AmplitudeAPI::TRACK_URI_STRING, body, headers)
+      end
+
       context "with only user_id" do
         it "sends the event to Amplitude" do
           event = AmplitudeAPI::Event.new(
@@ -65,6 +90,31 @@ describe AmplitudeAPI do
     end
 
     context "with multiple events" do
+      it "can send options" do
+        event = AmplitudeAPI::Event.new(
+          user_id: 123,
+          event_type: "clicked on sign up"
+        )
+        event2 = AmplitudeAPI::Event.new(
+          user_id: 456,
+          event_type: "liked a widget"
+        )
+        options = { min_id_length: 456 }
+        described_class.config.options = options
+
+        allow(Faraday).to receive(:post)
+
+        described_class.track([event, event2])
+
+        headers = { "Content-Type" => "application/json" }
+        body = JSON.generate(
+          api_key: described_class.api_key,
+          events: [event.to_hash, event2.to_hash],
+          options: options
+        )
+        expect(Faraday).to have_received(:post).with(AmplitudeAPI::TRACK_URI_STRING, body, headers)
+      end
+
       it "sends all events in a single request" do
         event = AmplitudeAPI::Event.new(
           user_id: 123,
