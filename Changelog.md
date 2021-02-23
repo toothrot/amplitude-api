@@ -3,6 +3,9 @@
 We would like to think our many [contributors](https://github.com/toothrot/amplitude-api/graphs/contributors) for
 suggestions, ideas and improvements to Amplitude API.
 
+## 0.3.2 (2021-02-23)
+* Creates new properties on initialization
+
 ## 0.3.1 (2021-02-23)
 * Allows sending options to Amplitude
 * Solves an error when accessing event properties not been created yet
