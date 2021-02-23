@@ -334,6 +334,19 @@ describe AmplitudeAPI::Event do
       )
     }
 
+    it "creates properties on initialization" do
+      property_value = "an arbitrary value"
+      creation_data = {
+        user_id: "whatever",
+        event_type: "something happened",
+        arbitrary_property: property_value
+      }
+
+      initialized_event = klass.new(creation_data)
+
+      expect(initialized_event.arbitrary_property).to eq property_value
+    end
+
     it "creates arbitrary properties when assigning values" do
       event.arbitrary_property = "arbitrary value"
 

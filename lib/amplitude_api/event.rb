@@ -16,11 +16,11 @@ class AmplitudeAPI
     # See (Amplitude HTTP API Documentation)[https://developers.amplitude.com/docs/http-api-v2]
     # for a list of valid parameters and their types.
     def initialize(attributes = {})
+      @extra_properties = []
       attributes.each do |k, v|
-        send("#{k}=", v) if respond_to?("#{k}=")
+        send("#{k}=", v)
       end
       validate_arguments
-      @extra_properties = []
     end
 
     def method_missing(method_name, *args)
