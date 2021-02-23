@@ -347,6 +347,12 @@ describe AmplitudeAPI::Event do
       expect(event.respond_to?(:arbitrary_property=)).to be true
     end
 
+    it "does not define property until assigned" do
+      expect {
+        event.undefined_property
+      }.to raise_error NoMethodError, /undefined_property/
+    end
+
     it "do not accepts blocks when assigning values to create properties" do
       expect do
         event.arbitrary_property { puts "whatever" }

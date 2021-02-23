@@ -25,6 +25,7 @@ class AmplitudeAPI
 
     def method_missing(method_name, *args)
       super if block_given?
+      super unless method_name.to_s.end_with? "="
 
       property_name = method_name.to_s.delete_suffix("=")
 
