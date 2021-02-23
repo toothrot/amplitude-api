@@ -4,7 +4,8 @@ We would like to think our many [contributors](https://github.com/toothrot/ampli
 suggestions, ideas and improvements to Amplitude API.
 
 ## 0.3.1 (2021-02-23)
-* Solves an error when creating event with missing properties
+* Allows sending options to Amplitude
+* Solves an error when accessing event properties not been created yet
 
 ## 0.3.0 (2021-02-22)
 

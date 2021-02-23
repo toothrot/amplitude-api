@@ -43,7 +43,6 @@ AmplitudeAPI.track(event_1, event_2)
 
 ```ruby
 events = [event_1, event_2]
-
 AmplitudeAPI.track(*events)
 ```
 
@@ -53,6 +52,13 @@ You can change this behaviour and use your custom formatter. For example, in cas
 you wanted to use milliseconds instead of seconds you could do this:
 ```ruby
 AmplitudeAPI.config.time_formatter = ->(time) { time ? time.to_i : nil },
+```
+
+You can speficy track options in the config. The options will be applied to all subsequent requests:
+
+```ruby
+AmplitudeAPI.config.options = { min_id_length: 10 }
+AmplitudeAPI.track(event)
 ```
 
 
