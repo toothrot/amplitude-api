@@ -31,6 +31,31 @@ event = AmplitudeAPI::Event.new({
 AmplitudeAPI.track(event)
 ```
 
+You can track multiple events with a single call, with the only limit of the payload
+size imposed by Amplitude:
+
+```ruby
+event_1 = AmplitudeAPI::Event.new(...)
+event_2 = AmplitudeAPI::Event.new(...)
+
+AmplitudeAPI.track(event_1, event_2)
+```
+
+```ruby
+events = [event_1, event_2]
+
+AmplitudeAPI.track(*events)
+```
+
+In case you use an integer as the time, it is expected to be in seconds. Values in
+the time field will be converted to milliseconds using `->(time) { time ? time.to_i * 1_000 : nil }`
+You can change this behaviour and use your custom formatter. For example, in case
+you wanted to use milliseconds instead of seconds you could do this:
+```ruby
+AmplitudeAPI.config.time_formatter = ->(time) { time ? time.to_i : nil },
+```
+
+
 ## User Privacy APIs
 
 The following code snippet will delete a user from amplitude
