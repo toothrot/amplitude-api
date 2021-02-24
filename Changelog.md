@@ -3,6 +3,9 @@
 We would like to think our many [contributors](https://github.com/toothrot/amplitude-api/graphs/contributors) for
 suggestions, ideas and improvements to Amplitude API.
 
+## 0.3.3 (2021-02-24)
+* Relaxes Faraday dependency
+
 ## 0.3.2 (2021-02-23)
 * Creates new properties on initialization
 
