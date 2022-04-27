@@ -432,7 +432,7 @@ describe AmplitudeAPI do
   end
 
   describe ".delete" do
-    let(:connection) { instance_double("Faraday::Connection", post: nil, basic_auth: nil) }
+    let(:connection) { instance_double("Faraday::Connection", post: nil, request: nil) }
 
     before do
       allow(Faraday).to receive(:new).and_yield(connection).and_return(connection)
@@ -445,7 +445,7 @@ describe AmplitudeAPI do
 
       described_class.delete(user_ids: "123")
 
-      expect(connection).to have_received(:basic_auth).with(api_key, secret_key)
+      expect(connection).to have_received(:request).with(:basic_auth, api_key, secret_key)
     end
 
     it "sends the requester" do

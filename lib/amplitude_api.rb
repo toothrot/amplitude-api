@@ -189,7 +189,7 @@ class AmplitudeAPI
       amplitude_ids = Array(amplitude_ids)
 
       faraday = Faraday.new do |conn|
-        conn.basic_auth config.api_key, config.secret_key
+        conn.request :basic_auth, config.api_key, config.secret_key
       end
 
       faraday.post(
