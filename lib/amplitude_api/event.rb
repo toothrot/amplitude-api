@@ -39,13 +39,13 @@ class AmplitudeAPI
 
     def create_setter(attribute_name)
       self.class.send(:define_method, "#{attribute_name}=".to_sym) do |value|
-        instance_variable_set("@" + attribute_name.to_s, value)
+        instance_variable_set("@#{attribute_name}", value)
       end
     end
 
     def create_getter(attribute_name)
       self.class.send(:define_method, attribute_name.to_sym) do
-        instance_variable_get("@" + attribute_name.to_s)
+        instance_variable_get("@#{attribute_name}")
       end
     end
 
