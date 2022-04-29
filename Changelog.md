@@ -3,6 +3,9 @@
 We would like to think our many [contributors](https://github.com/toothrot/amplitude-api/graphs/contributors) for
 suggestions, ideas and improvements to Amplitude API.
 
+## 0.4.1 (2022-04-28)
+* Restores file needed for autoloading
+
 ## 0.4.0 (2022-04-28)
 * Increases required Ruby version to supported ones. Minimum Ruby version is now 2.7
 * Allows using version 2 of Faraday
