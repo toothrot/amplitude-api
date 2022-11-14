@@ -13,6 +13,8 @@ class AmplitudeAPI
   IDENTIFY_URI_STRING     = "https://api2.amplitude.com/identify"
   SEGMENTATION_URI_STRING = "https://amplitude.com/api/2/events/segmentation"
   DELETION_URI_STRING     = "https://amplitude.com/api/2/deletions/users"
+  COHORTS_URI_STRING      = "https://amplitude.com/api/3/cohorts"
+  MEMBERSHIP_URI_STRING   = "https://amplitude.com/api/3/cohorts/membership"
 
   USER_WITH_NO_ACCOUNT = "user who doesn't have an account"
 
@@ -169,6 +171,8 @@ class AmplitudeAPI
       }.delete_if { |_, value| value.nil? }
     end
 
+    # ==== User Deletion related methods
+
     # Delete a user from amplitude
     #
     # You must pass in either an array of user_ids or an array of amplitude_ids
@@ -188,13 +192,61 @@ class AmplitudeAPI
       user_ids = Array(user_ids)
       amplitude_ids = Array(amplitude_ids)
 
-      faraday = Faraday.new do |conn|
-        conn.request :basic_auth, config.api_key, config.secret_key
-      end
+      faraday = connection_with_basic_auth
 
       faraday.post(
         DELETION_URI_STRING,
         delete_body(user_ids, amplitude_ids, requester, ignore_invalid_id, delete_from_org),
+        "Content-Type" => "application/json"
+      )
+    end
+
+    # ==== Behavioural Cohort related methods
+
+    # Get all cohorts
+    #
+    # See https://www.docs.developers.amplitude.com/analytics/apis/behavioral-cohorts-api/#get-all-cohorts
+    #
+    # @return [ Faraday::Response ]
+    def get_cohorts
+      faraday = connection_with_basic_auth
+
+      faraday.get(COHORTS_URI_STRING, nil, "Content-Type" => "application/json")
+    end
+
+    # Add one or more users to a cohort
+    #
+    # See https://www.docs.developers.amplitude.com/analytics/apis/behavioral-cohorts-api/#update-cohort-membership
+    #
+    # @param [ String ] the ID of the cohort to add the users to
+    # @param [ Array<String> ] the user_ids (NOT amplitude_ids) that should be
+    # added to this cohort
+    # @return [ Faraday::Response ]
+    def add_to_cohort(cohort_id:, user_ids:)
+      update_cohort(cohort_id: cohort_id, user_ids: user_ids, operation: 'ADD')
+    end
+
+    # Remove one or more users from a cohort
+    #
+    # See https://www.docs.developers.amplitude.com/analytics/apis/behavioral-cohorts-api/#update-cohort-membership
+    #
+    # @param [ String ] the ID of the cohort to add the users to
+    # @param [ Array<String> ] the user_ids (NOT amplitude_ids) that should be
+    # removed from this cohort
+    # @return [ Faraday::Response ]
+    def remove_from_cohort(cohort_id:, user_ids:)
+      update_cohort(cohort_id: cohort_id, user_ids: user_ids, operation: 'REMOVE')
+    end
+
+    # Convenience helper method to add/remove users from a cohort
+    #
+    # See https://www.docs.developers.amplitude.com/analytics/apis/behavioral-cohorts-api/#update-cohort-membership
+    def update_cohort(cohort_id:, user_ids:, operation:)
+      faraday = connection_with_basic_auth
+
+      faraday.post(
+        MEMBERSHIP_URI_STRING,
+        update_cohort_body(cohort_id: cohort_id, user_ids: user_ids, operation: operation),
         "Content-Type" => "application/json"
       )
     end
@@ -211,6 +263,26 @@ class AmplitudeAPI
       body[:ignore_invalid_id] = ignore_invalid_id.to_s if ignore_invalid_id
       body[:delete_from_org] = delete_from_org.to_s if delete_from_org
       JSON.generate(body)
+    end
+
+    def update_cohort_body(cohort_id:, user_ids:, operation:)
+      {
+       cohort_id: cohort_id,
+       memberships: [
+         {
+            ids: user_ids,
+            id_type: 'BY_NAME',
+            operation: operation
+          }
+        ],
+       skip_invalid_ids: true
+     }.to_json
+    end
+
+    def connection_with_basic_auth
+      Faraday.new do |conn|
+        conn.request :authorization, :basic, config.api_key, config.secret_key
+      end
     end
   end
 end
