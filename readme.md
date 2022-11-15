@@ -78,6 +78,37 @@ AmplitudeAPI.delete(user_ids: ["12345"],
 )
 ```
 
+
+## Behavioural Cohorts APIs
+
+See the [Amplitude docs on Behavioural Cohorts](https://www.docs.developers.amplitude.com/analytics/apis/behavioral-cohorts-api).
+
+```ruby
+# Configure your Amplitude API key & secret key
+AmplitudeAPI.config.api_key = "abcdef123456"
+AmplitudeAPI.config.secret_key = "secretMcSecret"
+
+# Get all cohorts
+response = AmplitudeAPI.get_cohorts
+
+if response.status == 200
+  data = JSON.parse(response.body)
+
+  # print the ID & name of each cohort
+  data['cohorts'].each { |c| puts "id=#{c['id']} name=#{c['name']}" }
+end
+
+# Add / remove users from a cohort
+# You need to use the same user_ids you use when identifying users with the identify API
+
+# Incrementally add users to a cohort
+AmplitudeAPI.add_to_cohort(cohort_id: 'abcd123', user_ids: ['1234', '5678'])
+
+# Incrementally remove users from a cohort
+AmplitudeAPI.add_to_cohort(cohort_id: 'abcd123', user_ids: ['1234', '5678'])
+```
+
+
 Currently, we are using this in Rails and using ActiveJob to dispatch events asynchronously. I plan on moving
 background/asynchronous support into this gem.
 
