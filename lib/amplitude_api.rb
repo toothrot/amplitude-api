@@ -281,7 +281,7 @@ class AmplitudeAPI
 
     def connection_with_basic_auth
       Faraday.new do |conn|
-        conn.request :authorization, :basic, config.api_key, config.secret_key
+        conn.request :basic_auth, config.api_key, config.secret_key
       end
     end
   end
