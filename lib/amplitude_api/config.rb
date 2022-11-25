@@ -9,7 +9,7 @@ class AmplitudeAPI
 
     attr_accessor :api_key, :secret_key, :whitelist, :time_formatter,
                   :event_properties_formatter, :user_properties_formatter,
-                  :options
+                  :options, :timeout, :open_timeout, :read_timeout, :write_timeout
 
     def initialize
       self.class.defaults.each { |k, v| send("#{k}=", v) }
@@ -44,7 +44,10 @@ class AmplitudeAPI
           whitelist: base_properties + revenue_properties + optional_properties,
           time_formatter: ->(time) { time ? time.to_i * 1_000 : nil },
           event_properties_formatter: ->(props) { props || {} },
-          user_properties_formatter: ->(props) { props || {} }
+          user_properties_formatter: ->(props) { props || {} },
+          open_timeout: 60, # Net::HTTP default. Number of seconds to wait for the connection to open
+          read_timeout: 60, # Net::HTTP default. Number of seconds to wait for one block to be read
+          write_timeout: 60 # Net::HTTP default. Number of seconds to wait for one block to be written
         }
       end
     end

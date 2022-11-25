@@ -89,7 +89,11 @@ class AmplitudeAPI
     #
     # Send one or more Events to the Amplitude API
     def track(*events)
-      Faraday.post(TRACK_URI_STRING, track_body(events), "Content-Type" => "application/json")
+      Faraday.post(TRACK_URI_STRING, track_body(events), "Content-Type" => "application/json") do |request|
+        request.options.open_timeout = config.open_timeout
+        request.options.read_timeout = config.read_timeout
+        request.options.write_timeout = config.write_timeout
+      end
     end
 
     # ==== Identification related methods
@@ -132,7 +136,11 @@ class AmplitudeAPI
     #
     # Send one or more Identifications to the Amplitude Identify API
     def identify(*identifications)
-      Faraday.post(IDENTIFY_URI_STRING, identify_body(identifications))
+      Faraday.post(IDENTIFY_URI_STRING, identify_body(identifications)) do |request|
+        request.options.open_timeout = config.open_timeout
+        request.options.read_timeout = config.read_timeout
+        request.options.write_timeout = config.write_timeout
+      end
     end
 
     # ==== Event Segmentation related methods
@@ -157,7 +165,7 @@ class AmplitudeAPI
     #
     # @return [ Faraday::Response ]
     def segmentation(event, start_time, end_time, **options)
-      Faraday.get SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: {
+      params = {
         e: event.to_json,
         m: options[:m],
         start: start_time.strftime("%Y%m%d"),
@@ -167,6 +175,12 @@ class AmplitudeAPI
         g: options[:g],
         limit: options[:limit]
       }.delete_if { |_, value| value.nil? }
+
+      Faraday.get(SEGMENTATION_URI_STRING, userpwd: "#{api_key}:#{secret_key}", params: params) do |request|
+        request.options.open_timeout = config.open_timeout
+        request.options.read_timeout = config.read_timeout
+        request.options.write_timeout = config.write_timeout
+      end
     end
 
     # Delete a user from amplitude
@@ -190,6 +204,9 @@ class AmplitudeAPI
 
       faraday = Faraday.new do |conn|
         conn.request :basic_auth, config.api_key, config.secret_key
+        conn.options.open_timeout = config.open_timeout
+        conn.options.read_timeout = config.read_timeout
+        conn.options.write_timeout = config.write_timeout
       end
 
       faraday.post(
