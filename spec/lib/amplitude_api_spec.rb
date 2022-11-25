@@ -432,7 +432,8 @@ describe AmplitudeAPI do
   end
 
   describe ".delete" do
-    let(:connection) { instance_double("Faraday::Connection", post: nil, request: nil) }
+    let(:connection) { instance_double("Faraday::Connection", post: nil, request: nil, options: options) }
+    let(:options) { Faraday::RequestOptions.new }
 
     before do
       allow(Faraday).to receive(:new).and_yield(connection).and_return(connection)
